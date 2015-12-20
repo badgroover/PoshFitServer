@@ -45,8 +45,8 @@ var server = app.listen(8080, function () {
 
 //Validate user
 var validateUser = function(userName, password) {
-  console.log(userName);  
-  console.log(password);
+  console.log(userName.constructor);  
+  
   console.log("------------");  
   var queryString = 'SELECT * FROM userInfo WHERE email = ' + 
                    connection.escape(userName);
@@ -57,6 +57,7 @@ var validateUser = function(userName, password) {
       if(rows.length == 1) {
         console.log('User Name: ', rows[0].email);
         console.log('Password: ', rows[0].password);
+        console.log(rows[0].email.constructor);
         if(rows[0].email == userName && rows[0].password == password) {
           found = 1;
         }
