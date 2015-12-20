@@ -58,7 +58,7 @@ var validateUser = function(userName, password) {
         console.log('User Name: ', rows[0].email);
         console.log('Password: ', rows[0].password);
         console.log(rows[0].email.constructor);
-        if(rows[0].email == userName && rows[0].password == password) {
+        if(rows[0].email == userName) {
           found = 1;
         }
       }
