@@ -117,8 +117,10 @@ app.post('/login',function(req,res){
   console.log("User name = "+req.session.username+", password is "+req.session.password);
   var found = validateUser(req.body.user, req.body.password); 
   if(found == 1) {
+    console.log("LogIn success\n\n");  
     res.end("yes");
   } else {
+    console.log("LogIn Failed!\n\n");  
     res.end("no");
   }
 });
