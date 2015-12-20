@@ -44,7 +44,7 @@ var server = app.listen(8080, function () {
 });
 
 //Validate user
-var validateUser = function(userName, password) {
+var validateUser = function(userName, password, response) {
   console.log(userName.constructor);  
   
   console.log("------------");  
@@ -60,12 +60,13 @@ var validateUser = function(userName, password) {
         console.log(rows[0].email.constructor);
         if(rows[0].email == userName && rows[0].password == password) {
           console.log("Success Here!");
-          found = 1;
+          response.end("yes");
         }
       }
     }
     else {
       console.log('Error while performing Query.');
+      response.end("no");
     }
     return found;
   });  
@@ -120,7 +121,7 @@ app.post('/login',function(req,res){
   req.session.username = req.body.user;
   req.session.password = req.body.password;
   console.log("User name = "+req.session.username+", password is "+req.session.password);
-  var found = validateUser(req.body.user, req.body.password); 
+  var found = validateUser(req.body.user, req.body.password, response); 
   if(found == 1) {
     console.log("LogIn success\n\n");  
     res.end("yes");
