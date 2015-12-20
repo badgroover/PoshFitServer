@@ -60,7 +60,7 @@ var validateUser = function(userName, password, response) {
         console.log(rows[0].email.constructor);
         if(rows[0].email == userName && rows[0].password == password) {
           console.log("Success Here!");
-          response.end("yes");
+          response.end({as:bsndb"yes");
         }
       }
     }
@@ -121,14 +121,7 @@ app.post('/login',function(req,res){
   req.session.username = req.body.user;
   req.session.password = req.body.password;
   console.log("User name = "+req.session.username+", password is "+req.session.password);
-  var found = validateUser(req.body.user, req.body.password, res); 
-  if(found == 1) {
-    console.log("LogIn success\n\n");  
-    res.end("yes");
-  } else {
-    console.log("LogIn Failed!\n\n");  
-    res.end("no");
-  }
+  validateUser(req.body.user, req.body.password); 
 });
 
 app.post('/leaderboard',function(req,res){
