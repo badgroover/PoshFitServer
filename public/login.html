@@ -9,7 +9,7 @@
           user=$("#user").val();
           pass=$("#password").val();
           $.post("http://52.33.186.147:8080/login",{user: user,password: pass}, function(data){
-            console.log(data);
+            console.log("data"+data);
             if(data==='yes') {
                 alert("login success");
             } else {
