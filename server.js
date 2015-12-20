@@ -60,7 +60,7 @@ var validateUser = function(userName, password, response) {
         console.log(rows[0].email.constructor);
         if(rows[0].email == userName && rows[0].password == password) {
           console.log("Success Here!");
-          response.end({as:bsndb"yes");
+          response.end("yes");
         }
       }
     }
