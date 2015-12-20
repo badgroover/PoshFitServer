@@ -52,7 +52,6 @@ var validateUser = function(userName, password, response) {
   connection.query(queryString, function(err, rows, fields) {
     var found = 0; 
     if (!err) {
-      
       if(rows.length == 1) {
         console.log('User Name: ', rows[0].email);
         console.log('Password: ', rows[0].password);
@@ -65,8 +64,7 @@ var validateUser = function(userName, password, response) {
           response.end("no");
         }
       }
-    }
-    else {
+    } else {
       console.log('Error while performing Query.');
       response.end("no");
     }
