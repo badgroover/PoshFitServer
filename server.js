@@ -121,7 +121,7 @@ app.post('/login',function(req,res){
   req.session.username = req.body.user;
   req.session.password = req.body.password;
   console.log("User name = "+req.session.username+", password is "+req.session.password);
-  validateUser(req.body.user, req.body.password); 
+  validateUser(req.body.user, req.body.password, res); 
 });
 
 app.post('/leaderboard',function(req,res){
