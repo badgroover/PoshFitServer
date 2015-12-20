@@ -32,9 +32,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-//app.use(express.static(__dirname + '/public'));
-
-
 
 var server = app.listen(8080, function () {
   var host = server.address().address;
@@ -95,12 +92,12 @@ var getAllActivitiesInfo = function(cb) {
 //Home Page
 app.get('/', function (req, res) {
   console.log(req.session);
-  console.log("session name = "+req.session.username+", session password is "+req.session.password);
+  console.log('session name = '+req.session.username+', session password is '+req.session.password);
   if(req.session.username) {
     res.redirect('/leaderboard');
   }
   else{
-    res.sendFile('public/login.html' , { root : __dirname});
+    res.redirect('/login');
   }
 });
 
@@ -119,11 +116,17 @@ app.get('/Activities', function (req, res) {
   getAllActivitiesInfo( callback);
 });
 
+//Get login page
+app.get('/login',function(req,res){
+  console.log('User name = '+req.session.username+', password is '+req.session.password);
+  res.render('login');
+});
+
 //Post login info
 app.post('/login',function(req,res){
   req.session.username = req.body.user;
   req.session.password = req.body.password;
-  console.log("User name = "+req.session.username+", password is "+req.session.password);
+  console.log('User name = '+req.session.username+', password is '+req.session.password);
   validateUser(req.body.user, req.body.password, res); 
 });
 
