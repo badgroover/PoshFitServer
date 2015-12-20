@@ -63,6 +63,9 @@ var validateUser = function(userName, password, response) {
           console.log("Failed Here!");
           response.end("no");
         }
+      } else {
+          console.log("Failed Here!");
+          response.end("no");
       }
     } else {
       console.log('Error while performing Query.');
