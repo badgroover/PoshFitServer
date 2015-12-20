@@ -45,6 +45,9 @@ var server = app.listen(8080, function () {
 
 //Validate user
 var validateUser = function(userName, password) {
+  console.log(userName);  
+  console.log(password);
+  console.log("------------");  
   var queryString = 'SELECT * FROM userInfo WHERE email = ' + 
                    connection.escape(userName);
   connection.query(queryString, function(err, rows, fields) {
