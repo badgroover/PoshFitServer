@@ -68,7 +68,7 @@ var validateUser = function(userName, password) {
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
-  var queryString = 'SELECT * FROM activityInfo';
+  var queryString = 'SELECT * FROM activityMetadata';
   connection.query(queryString, function(err, rows, fields) {
     if (!err) {
       console.log("Step 2\n\n");  
