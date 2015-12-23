@@ -1,0 +1,8 @@
+{
+	"sql" : {
+		"host": "127.0.0.1",
+		"user": "ec2-user",
+		"password": "",
+		"db": "PoshfitDb"
+	}
+}

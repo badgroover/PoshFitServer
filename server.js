@@ -6,11 +6,13 @@ var path          = require("path");
 var bodyParser    = require("body-parser");
 
 var app = express();
+var envConfig = require('./config/' + (process.env.NODE_ENV || 'development') + '.json');  
+
 var connection = mysql.createConnection({
-  host     : '127.0.0.1',
-  user     : 'ec2-user',
-  password : '',
-  database : 'PoshfitDb'
+  host     : envConfig.sql.host,
+  user     : envConfig.sql.user,
+  password : envConfig.sql.password,
+  database : envConfig.sql.db
 });
 
 console.log(connection);
@@ -33,7 +35,8 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
 
-var server = app.listen(8080, function () {
+
+var server = app.listen(8083, function () {
   var host = server.address().address;
   var port = server.address().port;
 
@@ -94,15 +97,15 @@ app.get('/', function (req, res) {
   console.log(req.session);
   console.log('session name = '+req.session.username+', session password is '+req.session.password);
   if(req.session.username) {
-    res.redirect('/leaderboard');
+    res.redirect('/dashboard');
   }
   else{
     res.redirect('/login');
   }
 });
 
-//Home Page
-app.get('/Activities', function (req, res) {
+//Activities Page
+app.get('/activities', function (req, res) {
   var callback = {
     success : function success(result) {
       console.log("Step 3\n\n");  
@@ -130,6 +133,7 @@ app.post('/login',function(req,res){
   validateUser(req.body.user, req.body.password, res); 
 });
 
-app.post('/leaderboard',function(req,res){
+//Dashboard page (team homepage and data for other teams)
+app.post('/dashboard',function(req,res){
   res.end("yes");
 });
