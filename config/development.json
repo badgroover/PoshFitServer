@@ -4,5 +4,6 @@
 		"user": "ec2-user",
 		"password": "",
 		"db": "PoshfitDb"
-	}
+	},
+	"port" : 8083
 }

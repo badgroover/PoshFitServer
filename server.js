@@ -6,14 +6,24 @@ var path          = require("path");
 var bodyParser    = require("body-parser");
 
 var app = express();
+console.log(process.env);
 var envConfig = require('./config/' + (process.env.NODE_ENV || 'development') + '.json');  
 
+
+// var connection = mysql.createConnection({
+//   host     : envConfig.sql.host,
+//   user     : envConfig.sql.user,
+//   password : envConfig.sql.password,
+//   database : envConfig.sql.db
+// });
+
 var connection = mysql.createConnection({
-  host     : envConfig.sql.host,
-  user     : envConfig.sql.user,
-  password : envConfig.sql.password,
-  database : envConfig.sql.db
+  host     : "127.0.0.1",
+  user     : "ec2-user",
+  password : "",
+  database : "PoshfitDb"
 });
+
 
 console.log(connection);
 
@@ -36,7 +46,7 @@ app.set('views', __dirname + '/views');
 
 
 
-var server = app.listen(8083, function () {
+var server = app.listen(envConfig.port, function () {
   var host = server.address().address;
   var port = server.address().port;
 
