@@ -7,5 +7,5 @@ Step 3: "node server.js" will start the server.
 Note:
 Change the ip/port number in development.json to suit your needs. Use "node server.js dev" to run using the development config.
 Importing the PoshfitDb database into mysql:
-run "mysql -u username -p -h localhost DATA-BASE-NAME < PoshfitDb_backup.sql"
+run "mysql -u ec2-user  -h localhost PoshfitDb < PoshfitDb_backup.sql"
 
