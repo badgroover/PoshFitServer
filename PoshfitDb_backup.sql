@@ -19,7 +19,7 @@
 --
 -- Table structure for table `activityLog`
 --
-create database PoshfitDb;  
+
 DROP TABLE IF EXISTS `activityLog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
