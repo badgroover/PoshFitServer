@@ -4,6 +4,7 @@ var cookieParser  = require('cookie-parser')
 var mysql         = require('mysql');
 var path          = require("path");
 var bodyParser    = require("body-parser");
+var queryHelper   = require("./QueryHelper.js")
 
 var app = express();
 
@@ -16,27 +17,6 @@ if(argv.e == "dev") {
 } else {
 	envConfig = require('./config/production.json');  
 }
-
-
-var connection = mysql.createConnection({
-  host     : envConfig.sql.host,
-  user     : envConfig.sql.user,
-  password : envConfig.sql.password,
-  database : envConfig.sql.db
-});
-
-
-console.log(connection);
-
-connection.connect(function(err){
-if(!err) {
-    console.log("Database is connected ... \n\n");  
-} else {
-    console.log("New \n\n"); 
-    console.log("Error connecting database ... \n\n"); 
-    console.log(err);
-}
-});
 
 app.use(cookieParser());
 app.use(session({secret: '$#$##@#!'}));
@@ -56,50 +36,43 @@ var server = app.listen(envConfig.port, function () {
 
 //Validate user
 var validateUser = function(userName, password, response) {
-  console.log(userName.constructor);  
-  console.log("------------");  
-  var queryString = 'SELECT * FROM userInfo WHERE email = ' + 
-                   connection.escape(userName);
-  connection.query(queryString, function(err, rows, fields) {
-    var found = 0; 
-    if (!err) {
-      if(rows.length == 1) {
-        console.log('User Name: ', rows[0].email);
-        console.log('Password: ', rows[0].password);
-        console.log(rows[0].email.constructor);
-        if(rows[0].email == userName && rows[0].password == password) {
-          console.log("Success Here!");
-          response.end("yes");
-        } else {
-          console.log("Failed Here!");
-          response.end("no");
-        }
-      } else {
-          console.log("Failed Here!");
-          response.end("no");
-      }
-    } else {
-      console.log('Error while performing Query.');
-      response.end("no");
-    }
-    return found;
-  });  
+	console.log(userName.constructor);  
+  	console.log("------------");  
+  	var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(userName);
+  
+	queryHelper.runQuery(queryString, 
+		function success(rows) {
+    		if(rows.length == 1) {
+        		console.log('User Name: ', rows[0].email);
+        		console.log('Password: ', rows[0].password);
+        		if(rows[0].email == userName && rows[0].password == password) {
+          			response.end("yes");
+        		} else {
+          			response.end("no");
+        		}	
+	 		} else {
+      			response.end("no");
+			}
+		},
+		function error(error) {
+			console.log("Failed Here!");
+        	response.end("no");
+	});
 }
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
-  var queryString = 'SELECT * FROM activityMetadata';
-  connection.query(queryString, function(err, rows, fields) {
-    if (!err) {
-      console.log("Step 2\n\n");  
-      console.log(cb);  
-      return cb.success(rows);
-    }
-    else {
-      console.log("Step 3\n\n");  
-      return cb.error();
-    }
-  });  
+	var queryString = 'SELECT * FROM activityMetadata';
+	queryHelper.runQuery(queryString, 
+		function success(rows) {
+	      	console.log("Step 2\n\n");  
+	      	console.log(cb);  
+	      	return cb.success(rows);
+		},
+		function error(error) {
+	      	console.log("Step 3\n\n");  
+	      	return cb.error();
+	});
 }
 
 //---------------------------------Routes-----------------------------
