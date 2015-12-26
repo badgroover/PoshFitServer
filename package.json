@@ -9,8 +9,9 @@
     "ejs": "^2.3.4",
     "express": "^4.13.3",
     "express-session": "^1.12.1",
+    "minimist": "^1.2.0",
     "mysql": "^2.10.0",
-	"minimist":"^1.2.0"
+    "underscore": "^1.8.3"
   },
   "devDependencies": {},
   "scripts": {

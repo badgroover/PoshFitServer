@@ -5,5 +5,6 @@
 		"password": "",
 		"db": "PoshfitDb"
 	},
-	"port" : 8083
+	"port" : 8083,
+	"host" : "http://localhost"
 }

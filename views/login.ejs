@@ -1,15 +1,18 @@
 <html>
   <head>
     <title>Simple login</title>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
     <script>
       $(document).ready(function(){
         var user,pass;
         $("#submit").click(function(){
           console.log("Clicked!");
-          user=$("#user").val();
-          pass=$("#password").val();
-          $.post("http://52.33.186.147:8080/login",{user: user,password: pass}, function(data){
+          var user =$("#user").val(),
+            pass =$("#password").val(),
+            host = "<%= envConfig.host %>",
+            port = "<%= envConfig.port %>";
+          $.post(host + ":" + port + "/login",{user: user,password: pass}, function(data){
             console.log("data"+data);
             if(data==='yes') {
                 alert("login success");
