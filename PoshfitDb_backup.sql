@@ -16,7 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-create database PoshfitDb;
 --
 -- Table structure for table `activityLog`
 --
@@ -29,10 +28,13 @@ CREATE TABLE `activityLog` (
   `duration` int(11) NOT NULL,
   `date` datetime DEFAULT NULL,
   `team_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   KEY `activity_id` (`activity_id`),
   KEY `team_id` (`team_id`),
+  KEY `user_id` (`user_id`),
   CONSTRAINT `activityLog_ibfk_1` FOREIGN KEY (`activity_id`) REFERENCES `activityMetadata` (`id`),
-  CONSTRAINT `activityLog_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `teamMetadata` (`id`)
+  CONSTRAINT `activityLog_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `teamMetadata` (`id`),
+  CONSTRAINT `activityLog_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `userInfo` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
