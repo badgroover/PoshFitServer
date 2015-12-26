@@ -95,7 +95,8 @@ app.get('/', function (req, res) {
   }
 });
 
-//Activities Page
+//Activities Page - should show a static list of activities
+// TODO: Preethi
 app.get('/activities', function (req, res) {
   var callback = {
     success : function success(result) {
