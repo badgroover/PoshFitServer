@@ -16,6 +16,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
+create database PoshfitDb;
 --
 -- Table structure for table `activityLog`
 --
@@ -24,7 +25,7 @@ DROP TABLE IF EXISTS `activityLog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `activityLog` (
-  `activity_id` int(11) NOT NULL,
+  `activity_id` int(11) NOT NULL ,
   `duration` int(11) NOT NULL,
   `date` datetime DEFAULT NULL,
   `team_id` int(11) DEFAULT NULL,
@@ -52,12 +53,12 @@ DROP TABLE IF EXISTS `activityMetadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `activityMetadata` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL  PRIMARY KEY,
   `Category` varchar(40) NOT NULL,
   `Activity` varchar(40) NOT NULL,
   `Points` int(11) NOT NULL,
-  `Duration` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `Duration` int(11) NOT NULL
+
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,9 +80,8 @@ DROP TABLE IF EXISTS `teamMetadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `teamMetadata` (
-  `id` int(11) NOT NULL,
-  `team_name` varchar(40) NOT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL  AUTO_INCREMENT PRIMARY KEY,
+  `team_name` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -102,15 +102,20 @@ DROP TABLE IF EXISTS `userInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `userInfo` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL  AUTO_INCREMENT PRIMARY KEY,
   `email` varchar(40) NOT NULL,
   `password` varchar(40) NOT NULL,
   `team_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
   KEY `team_id` (`team_id`),
   CONSTRAINT `userInfo_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teamMetadata` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+insert into teamMetaData (team_name) values ('test_team1');
+insert into userInfo (email, password, team_id) values ('test1@poshmark.com', 'password', 1);
+
+insert into teamMetaData (team_name) values ('test_team2');
+insert into userInfo (email, password, team_id) values ('test2@poshmark.com', 'password', 1);
 
 --
 -- Dumping data for table `userInfo`
