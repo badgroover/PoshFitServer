@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<div class="container">
+	<h1>Available Activities</h1>
+	<table class="table table-condensed table-hover table-bordered">
+		<% Object.keys(activitiesByCategory).forEach(function(category){ %>
+			<tr>
+				<th><%= category %></th>
+			</tr>
+			<tr>
+				<th>Activity</th>
+				<th>Points for Duration</th>
+			</tr>
+			<% activitiesByCategory[category].forEach(function(activity){ %>
+				<tr>		
+					<td><%= activity.Activity %></td>
+					<td><%= activity.Points %> for <%= activity.Duration %> minutes</td>
+				</tr>
+			<% }) %>
+		<% }) %>
+	</table>
+</div>

@@ -1,18 +1,19 @@
-var express       = require('express');
-var session       = require('express-session');
-var cookieParser  = require('cookie-parser')
-var mysql         = require('mysql');
-var path          = require("path");
-var bodyParser    = require("body-parser");
-var queryHelper   = require("./QueryHelper.js")
-var _             = require("underscore");
-
-var app = express();
+var express       = require('express'),
+    session       = require('express-session'),
+    cookieParser  = require('cookie-parser'),
+    mysql         = require('mysql'),
+    path          = require("path"),
+    bodyParser    = require("body-parser"),
+    queryHelper   = require("./QueryHelper.js"),
+    _             = require("underscore"),
+    app = express();
 
 //Set up environment
-var envConfig;
-var argv = require('minimist')(process.argv.slice(2));
+var envConfig,
+    argv = require('minimist')(process.argv.slice(2));
+
 console.log(argv);
+
 if(argv.e == "dev") {
 	envConfig = require('./config/development.json');  
 } else {
@@ -20,50 +21,44 @@ if(argv.e == "dev") {
 }
 
 app.use(cookieParser());
-app.use(session({secret: '$#$##@#!'}));
+app.use(session({
+  secret: '$#$##@#!',
+  cookieName: 'pmfit',
+  duration: 24 * 60 * 60 * 1000, 
+  activeDuration: 5 * 60 * 1000
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-
-
 var server = app.listen(envConfig.port, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+  var host = server.address().address,
+      port = server.address().port;
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
 
-//Validate user
-var validateUser = function(request, response) {
+//Find user
+var findUser = function(username, password, callback) {
 
-	console.log(request.body.constructor);  
-  console.log("------------");  
-
-  var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(request.body.user);
+  var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
   
 	queryHelper.runQuery(queryString, 
 		function success(rows) {
     		if(rows.length == 1) {
-        		console.log('User Name: ', rows[0].email);
-        		console.log('Password: ', rows[0].password);
-        		if(rows[0].email == request.body.user && rows[0].password == request.body.password) {
-          			response.end("yes");
-                // request.session.username = request.body.user;
-                // request.session.password = request.body.password;
-                console.log("Post login session information");
-                console.log(request.session);
+        		if(rows[0].email == username && rows[0].password == password) {
+          		callback.success(username);
         		} else {
-          			response.end("no");
+          	   callback.error("Username or Password incorrect");
         		}	
 	 		} else {
-      			response.end("no");
+      			callback.error("Username or Password incorrect");
 			}
 		},
 		function error(error) {
 			console.log("Failed Here!");
-        	response.end("no");
+      callback.error("Something went wrong. Please try logging in later");
 	});
 }
 
@@ -82,33 +77,64 @@ var getAllActivitiesInfo = function(cb) {
 	});
 }
 
-//---------------------------------Routes-----------------------------
-//Home Page
-app.get('/', function (req, res) {
-  console.log(req.session);
-  console.log('session name = '+req.session.username+', session password is '+req.session.password);
-  if(req.session.username) {
-    res.redirect('/dashboard');
-  }
-  else{
-    res.redirect('/login');
+app.use(function(req, res, next) {
+  if (req.session && req.session.username && req.session.password) {
+    var callback = {
+      success: function success(username) {
+        req.user = username;
+        delete req.session.password; // delete the password from the session
+        req.session.username = username;  //refresh the session value
+        res.locals.username = username;
+        // finishing processing the middleware and run the route
+        console.log("Preexisting user session. Password has been removed from the session");
+        next();
+      },
+      error: function error(error) {
+        console.log("No user session match. Continue processing");
+        next();
+      }
+    };
+    findUser(req.session.username, req.session.password, callback);
+  } else {
+    console.log("No user session. Continue processing");
+    next();
   }
 });
 
-//Activities Page - should show a static list of activities
-// TODO: Preethi
+// Redirect to login if you are not logged in
+function requireLogin(req, res, next) {
+  if (!req.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+};
+
+//---------------------------------Routes-----------------------------
+//Home Page
+app.get('/', requireLogin, function (req, res) {
+  console.log(req.session);
+  console.log('session name = '+req.session.username+', session password is '+req.session.password);
+  res.redirect('/dashboard');
+});
+
+//Activities Page - shows static list of activities
 app.get('/activities', function (req, res) {
   var callback = {
     success : function success(result) {
-      console.log("Step 3\n\n");  
-      res.json(result);
+      activities = result;
+      activitiesByCategory = _.groupBy(activities, function(activity){
+        return activity.Category;
+      });
+      res.render('activities', {
+        activitiesByCategory: activitiesByCategory
+      });
     },
     error : function error(err) {
       res.send(err);
     }
   };
-  console.log("Step1\n\n");  
-  getAllActivitiesInfo( callback);
+  getAllActivitiesInfo(callback);
 });
 
 //Get login page
@@ -118,27 +144,35 @@ app.get('/login',function(req, res){
   });
 });
 
-// TODO: Preethi
-// Add a method to check if all routes are authentication i.e logged in pages 
-// Redirect to login if you are not logged in
-
 //Post login info
 app.post('/login',function(req, res){
-  console.log('User name = '+req.session.username+', password is '+req.session.password);
-  validateUser(req, res); 
+  console.log('User name = '+req.body.username+', password is '+req.body.password);
+  var callback = {
+    success: function success(username) {
+      req.session.username = username;
+      req.session.password = req.body.password;
+      res.redirect('/activities');
+    },
+    error: function error(error) {
+      // TODO: Preethi
+      // Update login page to handle errors and make it pretty 
+      res.render('login', {
+        envConfig: envConfig,
+        error: error
+      })
+    }
+  }
+  findUser(req.body.username, req.body.password, callback); 
 
-  // TODO:Preethi, Nikhil setting session values in validate isn't working
-  req.session.username = req.body.user;
-  req.session.password = req.body.password;
 });
 
 //Dashboard page (team homepage and data for other teams)
-app.post('/dashboard',function(req, res){
+app.post('/dashboard', requireLogin, function(req, res){
   res.end("yes");
 });
 
 //User activity page (you should be able to list all activities for a user and prompt to enter activities for that user)
-app.get('/:username/activities', function(req, res){
+app.get('/:username/activities', requireLogin, function(req, res){
   //Check user id against the session and make sure user logged in is the user we are checking against
   console.log("Session user");
   console.log(req.session.username);
@@ -199,8 +233,10 @@ app.get('/:username/activities', function(req, res){
 });
 
 // post for the user activity
-app.post('/:username/activities', function(req, res){
+app.post('/:username/activities', requireLogin, function(req, res){
     // set user activity
     // on submission we should gather data per day
     // userActivity = setUserActivityFor(username, "today", [{"id": 1, "Duration": 20}, {"id": 2 , "Duration": 40}]);
 });
+
+// TODO: add a path for logout
