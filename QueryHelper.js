@@ -19,6 +19,8 @@
 	});
 
 	module.exports.runQuery = function(queryString, onSuccess, onError) {
+		console.log("Query :")
+		console.log(queryString);
 		module.exports.pool.getConnection(function(err,connection){
         	if (err) {
 				console.log("Query Error 1");

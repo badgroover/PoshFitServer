@@ -49,11 +49,12 @@ var validateUser = function(request, response) {
         		console.log('User Name: ', rows[0].email);
         		console.log('Password: ', rows[0].password);
         		if(rows[0].email == request.body.user && rows[0].password == request.body.password) {
+                	request.session.username = request.body.user;
+                	request.session.password = request.body.password;
+					request.session.user_id = rows[0].id;
           			response.end("yes");
-                // request.session.username = request.body.user;
-                // request.session.password = request.body.password;
-                console.log("Post login session information");
-                console.log(request.session);
+                	console.log("Post login session information");
+                	console.log(request.session);
         		} else {
           			response.end("no");
         		}	
@@ -82,6 +83,34 @@ var getAllActivitiesInfo = function(cb) {
 	});
 }
 
+var getUserActivityFor = function(id, startDate, endDate, successCb, errorCb) {
+	/*
+	get all rows from the activityLog table where,
+	the user_id = userName.id AND
+	the date is today.
+	*/
+	
+	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id ;
+	queryHelper.runQuery(getUserId, 
+		function success(rows) {
+			console.log("UserInfo data");
+			console.log(rows);
+			successCb(rows);
+		},
+		function error(error) {
+	      	return errorCb();
+	});
+}
+
+//authenticate
+var isUserAuthenticated = function(session, userName) {
+	if(session.userName == userName) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 //---------------------------------Routes-----------------------------
 //Home Page
 app.get('/', function (req, res) {
@@ -98,7 +127,8 @@ app.get('/', function (req, res) {
 //Activities Page - should show a static list of activities
 // TODO: Preethi
 app.get('/activities', function (req, res) {
-  var callback = {
+  console.log('2. Session = '+req.session);
+	var callback = {
     success : function success(result) {
       console.log("Step 3\n\n");  
       res.json(result);
@@ -113,9 +143,10 @@ app.get('/activities', function (req, res) {
 
 //Get login page
 app.get('/login',function(req, res){
-  res.render('login', {
-    envConfig: envConfig
-  });
+  	var now = new Date();
+	res.render('login', {
+    	envConfig: envConfig
+  	});
 });
 
 // TODO: Preethi
@@ -124,12 +155,7 @@ app.get('/login',function(req, res){
 
 //Post login info
 app.post('/login',function(req, res){
-  console.log('User name = '+req.session.username+', password is '+req.session.password);
   validateUser(req, res); 
-
-  // TODO:Preethi, Nikhil setting session values in validate isn't working
-  req.session.username = req.body.user;
-  req.session.password = req.body.password;
 });
 
 //Dashboard page (team homepage and data for other teams)
@@ -148,51 +174,56 @@ app.get('/:username/activities', function(req, res){
   if(req.session.username == (req.params.username + "@poshmark.com")){
 
     var callback = {
-      success : function success(result) { 
+      success : function success(result) { 	
         activities = result;
-        // get user activity
-        // TODO: Preethi 
-        // userActivity = getUserActivityFor(username, "today");
+		startDate = '2015-12-27T08:0:00.000Z';
+		endDate = '2015-12-28T08:0:00.000Z'
+        userActivity = getUserActivityFor(req.session.user_id, startDate, endDate,  
+		function success(result) {
+			userActivities = result;
+	        _.each(activities, function(activity){
+	          matchedActivity = _.find(userActivities, function(userActivity){
+	            return userActivity.user_id == activity.id
+	          })
+	          if(matchedActivity) {
+	            _.extend(activity, {'userActivity': matchedActivity})
+	          }
+	        });
+
+	        activitiesByCategory = _.groupBy(activities, function(activity){
+	          return activity.Category;
+	        });
+
+	        // Send response of activities here
+	        // TODO: Preethi 
+	        // Show the date time stamp on the top of the page
+			console.log(activitiesByCategory);
+
+	        res.render('user/activities', {
+	          activitiesByCategory: activitiesByCategory
+	        });
+		},
+		function error(err) {
+			//return error
+		});
         
-        userActivities = [
-          {
-            "id": 1,
-            "Duration": 0
-          },
-          {
-            "id": 24,
-            "Duration": 45
-          }
-        ]
-
-        _.each(activities, function(activity){
-          matchedActivity = _.find(userActivities, function(userActivity){
-            return userActivity.id == activity.id
-          })
-          if(matchedActivity) {
-            _.extend(activity, {'userActivity': matchedActivity})
-          }
-        });
-        
-        activitiesByCategory = _.groupBy(activities, function(activity){
-          return activity.Category;
-        });
-
-        // Send response of activities here
-        // TODO: Preethi 
-        // Show the date time stamp on the top of the page
-
-        res.render('user/activities', {
-          activitiesByCategory: activitiesByCategory
-        });
+        // userActivities = [
+        //   {
+        //     "id": 1,
+        //     "Duration": 0
+        //   },
+        //   {
+        //     "id": 24,
+        //     "Duration": 45
+        //   }
+        // ]
 
       },
       error : function error(err) {
-        //ignore error
+			//return error
       }
     };
-    getAllActivitiesInfo(callback);
-
+	getAllActivitiesInfo(callback);
   } else {
     res.send('Username doesn\'t match the user logged in');
   }
