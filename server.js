@@ -6,7 +6,7 @@ var express       = require('express'),
     bodyParser    = require("body-parser"),
     queryHelper   = require("./QueryHelper.js"),
     _             = require("underscore"),
-    app = express();
+    app           = express();
 
 //Set up environment
 var envConfig,
@@ -77,38 +77,33 @@ var getAllActivitiesInfo = function(cb) {
 	});
 }
 
-app.use(function(req, res, next) {
-  if (req.session && req.session.username && req.session.password) {
-    var callback = {
-      success: function success(username) {
-        req.user = username;
-        delete req.session.password; // delete the password from the session
-        req.session.username = username;  //refresh the session value
-        res.locals.username = username;
-        // finishing processing the middleware and run the route
-        console.log("Preexisting user session. Password has been removed from the session");
-        next();
-      },
-      error: function error(error) {
-        console.log("No user session match. Continue processing");
-        next();
-      }
-    };
-    findUser(req.session.username, req.session.password, callback);
-  } else {
-    console.log("No user session. Continue processing");
-    next();
-  }
-});
-
 // Redirect to login if you are not logged in
 function requireLogin(req, res, next) {
-  if (!req.user) {
+  if (!req.session && !req.session.username) {
     res.redirect('/login');
   } else {
     next();
   }
 };
+
+var getUserActivityFor = function(id, startDate, endDate, successCb, errorCb) {
+	/*
+	get all rows from the activityLog table where,
+	the user_id = userName.id AND
+	the date is today.
+	*/
+	
+	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id ;
+	queryHelper.runQuery(getUserId, 
+		function success(rows) {
+			console.log("UserInfo data");
+			console.log(rows);
+			successCb(rows);
+		},
+		function error(error) {
+	     return errorCb();
+	});
+}
 
 //---------------------------------Routes-----------------------------
 //Home Page
@@ -120,7 +115,8 @@ app.get('/', requireLogin, function (req, res) {
 
 //Activities Page - shows static list of activities
 app.get('/activities', function (req, res) {
-  var callback = {
+  console.log('2. Session = '+req.session);
+	var callback = {
     success : function success(result) {
       activities = result;
       activitiesByCategory = _.groupBy(activities, function(activity){
@@ -139,9 +135,10 @@ app.get('/activities', function (req, res) {
 
 //Get login page
 app.get('/login',function(req, res){
-  res.render('login', {
-    envConfig: envConfig
-  });
+  var now = new Date();
+	res.render('login', {
+    	envConfig: envConfig
+  	});
 });
 
 //Post login info
@@ -163,7 +160,6 @@ app.post('/login',function(req, res){
     }
   }
   findUser(req.body.username, req.body.password, callback); 
-
 });
 
 //Dashboard page (team homepage and data for other teams)
@@ -182,32 +178,41 @@ app.get('/:username/activities', requireLogin, function(req, res){
   if(req.session.username == (req.params.username + "@poshmark.com")){
 
     var callback = {
-      success : function success(result) { 
+      success : function success(result) { 	
         activities = result;
-        // get user activity
-        // TODO: Preethi 
-        // userActivity = getUserActivityFor(username, "today");
+		    startDate = '2015-12-27T08:0:00.000Z';
+		    endDate = '2015-12-28T08:0:00.000Z'
+        userActivities = getUserActivityFor(req.session.user_id, startDate, endDate,  
+          function success(result) {
+			       userActivities = result;
+		      },
+		      function error(err) {
+			       //return error
+		      });
+
+        console.log("User Activity!");
+        console.log(userActivities);
         
-        userActivities = [
-          {
-            "id": 1,
-            "Duration": 0
-          },
-          {
-            "id": 24,
-            "Duration": 45
-          }
-        ]
+        // userActivities = [
+        //   {
+        //     "id": 1,
+        //     "Duration": 0
+        //   },
+        //   {
+        //     "id": 24,
+        //     "Duration": 45
+        //   }
+        // ]
 
         _.each(activities, function(activity){
           matchedActivity = _.find(userActivities, function(userActivity){
-            return userActivity.id == activity.id
+            return userActivity.user_id == activity.id
           })
           if(matchedActivity) {
-            _.extend(activity, {'userActivity': matchedActivity})
+          _.extend(activity, {'userActivity': matchedActivity})
           }
         });
-        
+
         activitiesByCategory = _.groupBy(activities, function(activity){
           return activity.Category;
         });
@@ -215,6 +220,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
         // Send response of activities here
         // TODO: Preethi 
         // Show the date time stamp on the top of the page
+        console.log(activitiesByCategory);
 
         res.render('user/activities', {
           activitiesByCategory: activitiesByCategory
@@ -222,11 +228,10 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
       },
       error : function error(err) {
-        //ignore error
+			//return error
       }
     };
-    getAllActivitiesInfo(callback);
-
+	getAllActivitiesInfo(callback);
   } else {
     res.send('Username doesn\'t match the user logged in');
   }
