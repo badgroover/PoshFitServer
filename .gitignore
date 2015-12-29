@@ -1,0 +1,12 @@
+# OS generated
+################
+.DS_Store
+views/.DS_Store
+
+# Log files
+###############
+*.log
+
+# Node Modules
+###############
+node_modules/**
