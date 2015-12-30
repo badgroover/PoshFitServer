@@ -1,26 +1,29 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <% include ../views/partials/head %>
     <title>Poshfit Challange Login</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  <body>
-    <div class="container">
-      <h1>Hello there !</h1>
-            
-      <form class="form-horizontal" action="<%= envConfig.host %>:<%= envConfig.port %>/login" method="post">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="email" class="form-control" id="username" name="username" placeholder="Email">
-        </div>
-        
-        <div class="form-group">
-          <label for="paswword">Password</label>
-          <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-        </div>
-        
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-    </div>
+  <body class="container">
+    <h2>Hello there !</h2>
+          
+    <form class="form-horizontal" action="/login" method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="email" class="form-control" id="username" name="username" placeholder="Email">
+      </div>
+      
+      <div class="form-group">
+        <label for="paswword">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+      </div>
+      
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+
+    <footer>
+      <% include ../views/partials/footer %>
+    </footer>
+
   </body>
 </html>

@@ -1,6 +1,14 @@
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<div class="container">
-	<h1>Available Activities</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include ../views/partials/head %>
+    <title>Poshfit Challange Activities List</title>
+  </head>
+  <body class="container">
+  	<header>
+      <% include ../views/partials/header %>
+    </header>
+	<h2>List of Activities and Points</h2>
 	<table class="table table-condensed table-hover table-bordered">
 		<% Object.keys(activitiesByCategory).forEach(function(category){ %>
 			<tr>
@@ -8,7 +16,7 @@
 			</tr>
 			<tr>
 				<th>Activity</th>
-				<th>Points for Duration</th>
+				<th>Points for Duration (in minutes)</th>
 			</tr>
 			<% activitiesByCategory[category].forEach(function(activity){ %>
 				<tr>		
@@ -18,4 +26,9 @@
 			<% }) %>
 		<% }) %>
 	</table>
-</div>
+
+	<footer>
+      <% include ../views/partials/footer %>
+    </footer>
+  </body>
+</html>
