@@ -112,6 +112,41 @@ var getUserActivityFor = function(id, startDate, successCb, errorCb) {
 	});
 }
 
+var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
+	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId  + ' team_id = ' + team_id;
+
+	var numItems = data.length;
+	for(var i=0; i< numItems; i++) {
+		var rowData = data[i];
+		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activity_id + ' and date = ' + queryHelper.esc(rowData.date);
+		console.log(sql);
+		queryHelper.runQuery(sql,
+			function success (rows) {
+				if(rows.length == 1) {
+					//found a prev entry...update..
+				} else if(rows.length == 0) {
+					//isert a new entry
+				}
+			},
+			function error(error) {
+				
+			}
+		);
+		
+	}
+	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(startDate);
+	queryHelper.runQuery(getUserId, 
+		function success(rows) {
+			console.log("UserInfo data");
+			console.log(rows);
+			successCb(rows);
+		},
+		function error(error) {
+			console.log(error);
+	     	return errorCb();
+	});
+}
+
 //---------------------------------Routes-----------------------------
 //Home Page
 app.get('/', requireLogin, function (req, res) {
@@ -228,10 +263,10 @@ app.get('/:username/activities', requireLogin, function(req, res){
               activitiesByCategory: activitiesByCategory,
               displayDate: displayDate
             });
-		      },
-		      function error(err) {
-			       //return error
-		      });
+		},
+		function error(err) {
+			//return error
+		});
       },
       error : function error(err) {
 			//return error
@@ -249,6 +284,17 @@ app.post('/:username/activities', requireLogin, function(req, res){
     console.log("IN HERE");
     console.log(req.body);
     console.log(req.body.params);
+  	if(req.session.username == req.params.username){
+	
+	}
+	setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
+		function success(result) {
+			  res.end("yes");
+      	},
+      	function error(err) {
+			  res.end("no");
+      	}
+	);
 });
 
 // Logout
