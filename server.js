@@ -54,7 +54,7 @@ var findUser = function(username, password, callback) {
 		function success(rows) {
     		if(rows.length == 1) {
         		if(rows[0].email == username && rows[0].password == password) {
-          		callback.success(username, rows[0].id);
+          		callback.success(username, rows[0].id, rows[0].team_id);
         		} else {
           	   callback.error("Username or Password incorrect");
         		}	
@@ -92,14 +92,14 @@ function requireLogin(req, res, next) {
   }
 };
 
-var getUserActivityFor = function(id, startDate, endDate, successCb, errorCb) {
+var getUserActivityFor = function(id, startDate, successCb, errorCb) {
 	/*
 	get all rows from the activityLog table where,
 	the user_id = userName.id AND
 	the date is today.
 	*/
 	
-	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id ;
+	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(startDate);
 	queryHelper.runQuery(getUserId, 
 		function success(rows) {
 			console.log("UserInfo data");
@@ -107,7 +107,8 @@ var getUserActivityFor = function(id, startDate, endDate, successCb, errorCb) {
 			successCb(rows);
 		},
 		function error(error) {
-	     return errorCb();
+			console.log(error);
+	     	return errorCb();
 	});
 }
 
@@ -148,25 +149,26 @@ app.get('/login',function(req, res){
 //Post login info
 app.post('/login',function(req, res){
   console.log('User name = '+req.body.username+', password is '+req.body.password);
-  var callback = {
-    success: function success(username, user_id) {
-      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      req.session.email = username
-      req.session.username = re.exec(username)[1];
-      console.log("USER NAME IS - " + req.session.username)
-      req.session.user_id = user_id
-      req.session.password = req.body.password;
-      res.redirect('/activities');
-    },
-    error: function error(error) {
-      // TODO: Preethi
-      // Update login page to handle errors and make it pretty 
-      res.render('login', {
-        error: error
-      })
-    }
-  }
-  findUser(req.body.username, req.body.password, callback); 
+  	var callback = {
+		success: function success(username, user_id, team_id) {
+      		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      		req.session.email = username
+      		req.session.username = re.exec(username)[1];
+      		console.log("USER NAME IS - " + req.session.username)
+      		req.session.user_id = user_id;
+			req.session.team_id = team_id;
+      		req.session.password = req.body.password;
+      		res.redirect('/activities');
+    	},
+    	error: function error(error) {
+      		// TODO: Preethi
+      		// Update login page to handle errors and make it pretty 
+      		res.render('login', {
+        		error: error
+      		})
+    	}
+	}
+  	findUser(req.body.username, req.body.password, callback); 
 });
 
 // TODO: Preethi
@@ -202,12 +204,9 @@ app.get('/:username/activities', requireLogin, function(req, res){
         }
 
         // Remove this hardcoded value after testing
-		    startDate = '2015-12-27T08:0:00.000Z';
-		    endDate = '2015-12-28T08:0:00.000Z';
-
-        getUserActivityFor(req.session.user_id, startDate, endDate,  
-          function success(result) {
-
+		startDate = '2015-12-27T08:0:00.000Z';
+        getUserActivityFor(req.session.user_id, startDate,  
+        function success(result) {
             userActivities = result;
             _.each(activities, function(activity){
               matchedActivity = _.find(userActivities, function(userActivity){
@@ -246,14 +245,6 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
 // post for the user activity
 app.post('/:username/activities', requireLogin, function(req, res){
-    //Nikhil: The data sent from the client should contain a UTC timestamp.
-    //Also, the client should save the timestamp when the user enters the activity page for "today" and
-    //rechecks on "Submit". A difference in timestamps should be indicated to the user as a warning
-    //"Too late to set data!". All this to handle the case when the user submits data for a day that has ended
-    // set user activity
-    // on submission we should gather data per day
-    // userActivity = setUserActivityFor(username, "today", [{"id": 1, "Duration": 20}, {"id": 2 , "Duration": 40}]);
-    // enforce time constrainst for submit here
     res.end("yes");
     console.log("IN HERE");
     console.log(req.body);
