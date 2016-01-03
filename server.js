@@ -229,10 +229,15 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
 // post for the user activity
 app.post('/:username/activities', requireLogin, function(req, res){
+    //Nikhil: The data sent from the client should contain a UTC timestamp.
+    //Also, the client should save the timestamp when the user enters the activity page for "today" and
+    //rechecks on "Submit". A difference in timestamps should be indicated to the user as a warning
+    //"Too late to set data!". All this to handle the case when the user submits data for a day that has ended
     // set user activity
     // on submission we should gather data per day
     // userActivity = setUserActivityFor(username, "today", [{"id": 1, "Duration": 20}, {"id": 2 , "Duration": 40}]);
     // enforce time constrainst for submit here
+    res.end("yes");
 });
 
 // Logout
