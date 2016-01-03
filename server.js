@@ -100,7 +100,6 @@ var getUserActivityFor = function(id, startDate, endDate, successCb, errorCb) {
 	*/
 	
 	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id ;
-  console.log("USER ID FOUND " +getUserId);
 	queryHelper.runQuery(getUserId, 
 		function success(rows) {
 			console.log("UserInfo data");
@@ -183,8 +182,26 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
     var callback = {
       success : function success(result) { 	
-        activities = result;
+        var activities = result,
+          today = new Date(),
+          yesterday = new Date(),
+          dayBeforeYesterday = new Date(),
+          displayDate;
+
+        yesterday.setDate(today.getDate() - 1);
+        dayBeforeYesterday.setDate(yesterday.getDate() -1);
         // TODO: Preethi set the time correctly here based on query params i.e 'today' or 'yesterday'
+        if(req.query.for == "today"){
+          startDate = yesterday.toISOString();
+          endDate = today.toISOString();
+          displayDate = today;
+        } else {
+          startDate = dayBeforeYesterday.toISOString();
+          endDate = yesterday.toISOString();
+          displayDate = yesterday;
+        }
+
+        // Remove this hardcoded value after testing
 		    startDate = '2015-12-27T08:0:00.000Z';
 		    endDate = '2015-12-28T08:0:00.000Z';
 
@@ -210,7 +227,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
             res.render('user/activities', {
               activitiesByCategory: activitiesByCategory,
-              displayDate: new Date()
+              displayDate: displayDate
             });
 		      },
 		      function error(err) {
@@ -238,12 +255,15 @@ app.post('/:username/activities', requireLogin, function(req, res){
     // userActivity = setUserActivityFor(username, "today", [{"id": 1, "Duration": 20}, {"id": 2 , "Duration": 40}]);
     // enforce time constrainst for submit here
     res.end("yes");
+    console.log("IN HERE");
+    console.log(req.body);
+    console.log(req.body.params);
 });
 
 // Logout
 app.get('/logout', requireLogin, function(req, res){
   // clear session variables here
-  req.session.reset();
+  req.session.destroy();
   res.redirect('/login');
 });
 
