@@ -150,13 +150,15 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
 								].join(' ');
                 console.log("INSERT SQL :");
                 console.log(insertSql);
-				// queryHelper.runQuery(insertSql, 
-				// 	function success() {
-				// 		successCb();
-				// 	},
-				// 	function error() {
-				// 		errorCb();
-				// 	})
+				queryHelper.runQuery(insertSql, 
+					function success() {
+						rowData.isOK = true;
+						successCb();
+					},
+					function error() {
+						rowData.isOK = true;
+						errorCb();
+					})
 				successCb();
             }
         },
