@@ -50,13 +50,17 @@ $(document).ready(function(){
  		
       // Get current time and check it against the time with which the page was loaded.
       var today = new Date(),
+      	  yesterday = new Date(),
+      	  yesterdaysDate,
       	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 
-      if(activityDate === currentDate) {
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
+
+      if(activityDate === currentDate || activityDate === yesterdaysDate) {
       	$(this).append('<input type="hidden" name="activityDate" value="'+ currentDate +'" /> ');	
       	return true;
       } else {
-      	// TODO: Preethi Check that you can update yesterday's data
       	alert("Too late to submit data for " + activityDate + " !");
       	// TODO: Preethi redirect to the dashboard page here 
       	window.location.replace("/activities");

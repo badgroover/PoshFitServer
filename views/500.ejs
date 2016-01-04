@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include ../views/partials/head %>
+    <title>Poshfit Challange</title>
+  </head>
+  <body class="container">
+
+    <header>
+      <% include ../views/partials/header %>
+    </header>
+	<h2>Error: <%= error.message %></h2>
+	<% if (settings['verbose errors']) { %>
+  		<pre><%= error.stack %></pre>
+	<% } else { %>
+  	<p>An error occurred!</p>
+	<% } %>
+    <footer>
+      <% include ../views/partials/footer %>
+    </footer>
+
+  </body>
+</html>
