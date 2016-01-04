@@ -33,7 +33,8 @@
 					console.log("Query Success");
                     onSuccess(rows);
                 } else {
-					console.log("Query Error 2");
+					console.log("Query Error 2:");
+					console.log(err);
                     onError(err);
                 }           
             });

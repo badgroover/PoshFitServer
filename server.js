@@ -15,9 +15,9 @@ var envConfig,
 console.log(argv);
 
 if(argv.e == "dev") {
-	envConfig = require('./config/development.json');  
+    envConfig = require('./config/development.json');  
 } else {
-	envConfig = require('./config/production.json');  
+    envConfig = require('./config/production.json');  
 }
 
 app.use(cookieParser());
@@ -50,37 +50,37 @@ var findUser = function(username, password, callback) {
 
   var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
   
-	queryHelper.runQuery(queryString, 
-		function success(rows) {
-    		if(rows.length == 1) {
-        		if(rows[0].email == username && rows[0].password == password) {
-          		callback.success(username, rows[0].id, rows[0].team_id);
-        		} else {
-          	   callback.error("Username or Password incorrect");
-        		}	
-	 		} else {
-      			callback.error("Username or Password incorrect");
-			}
-		},
-		function error(error) {
-			console.log("Failed Here!");
+    queryHelper.runQuery(queryString, 
+        function success(rows) {
+            if(rows.length == 1) {
+                if(rows[0].email == username && rows[0].password == password) {
+                callback.success(username, rows[0].id, rows[0].team_id);
+                } else {
+               callback.error("Username or Password incorrect");
+                }   
+            } else {
+                callback.error("Username or Password incorrect");
+            }
+        },
+        function error(error) {
+            console.log("Failed Here!");
       callback.error("Something went wrong. Please try logging in later");
-	});
+    });
 }
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
-	var queryString = 'SELECT * FROM activityMetadata';
-	queryHelper.runQuery(queryString, 
-		function success(rows) {
-	      	console.log("Step 2\n\n");  
-	      	console.log(cb);  
-	      	return cb.success(rows);
-		},
-		function error(error) {
-	      	console.log("Step 3\n\n");  
-	      	return cb.error();
-	});
+    var queryString = 'SELECT * FROM activityMetadata';
+    queryHelper.runQuery(queryString, 
+        function success(rows) {
+            console.log("Step 2\n\n");  
+            console.log(cb);  
+            return cb.success(rows);
+        },
+        function error(error) {
+            console.log("Step 3\n\n");  
+            return cb.error();
+    });
 }
 
 // Redirect to login if you are not logged in
@@ -93,56 +93,108 @@ function requireLogin(req, res, next) {
 };
 
 var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
-	/*
-	get all rows from the activityLog table where,
-	the user_id = userName.id AND
-	the date is today.
-	*/
-	
-	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(activityDate);
-	queryHelper.runQuery(getUserId, 
-		function success(rows) {
-			successCb(rows);
-		},
-		function error(error) {
-			console.log(error);
-	     	return errorCb();
-	});
+    /*
+    get all rows from the activityLog table where,
+    the user_id = userName.id AND
+    the date is today.
+    */
+    
+    var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(activityDate);
+    queryHelper.runQuery(getUserId, 
+        function success(rows) {
+            successCb(rows);
+        },
+        function error(error) {
+            console.log(error);
+            return errorCb();
+    });
 }
-
+var updateActivityLog = function(sql, rowData, successCb, errorCb) {
+    queryHelper.runQuery(sql,
+        function success (rows) {
+            if(rows.length == 1) {
+                //found a prev entry...update..
+                var updateSql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
+								 ' ,duration = ' + rowData.duration,
+								 ' ,points = ' + rowData.points,
+								 ' where user_id = ' + rowData.userId ,
+								 ' and activity_id = ' + rowData.activityId,
+								 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
+                console.log("UPDATE for :");
+                console.log(rowData);
+				queryHelper.runQuery(updateSql, 
+					function success() {
+						rowData.isOK = true;
+						successCb();
+					},
+					function error() {
+						rowData.isOK = false;
+						errorCb();
+					})
+            } else if(rows.length == 0) {
+                var insertSql = [	
+									'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
+								 	rowData.userId + ',',
+									rowData.teamId + ',',
+									rowData.activityId + ',',
+									rowData.duration + ',',
+								 	rowData.points + ',',
+									queryHelper.esc(rowData.date) + ')'
+								].join(' ');
+                console.log("INSERT SQL :");
+                console.log(insertSql);
+				// queryHelper.runQuery(insertSql, 
+				// 	function success() {
+				// 		successCb();
+				// 	},
+				// 	function error() {
+				// 		errorCb();
+				// 	})
+				successCb();
+            }
+        },
+        function error(error) {
+            errorCb();
+        }
+    );
+}
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
-	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
+    var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
+
 	var numItems = data.length;
-	var allOK = true;
-	for(var i=0; (i< numItems && allOK == true); i++) {
-		var rowData = data[i];
-    console.log("Current Row ");
-    console.log(rowData);
+
+	for(var i=0; (i< numItems); i++) {
+    	var rowData = data[i];
+		rowData.userId = userId;
+		rowData.teamId = teamId;
+		rowData.isOK = false;
 		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
-		queryHelper.runQuery(sql,
-			function success (rows) {
-				if(rows.length == 1) {
-					//found a prev entry...update..
-					var updateSql = 'update activityLog set date = ' + queryHelper.esc(rowData.date) + ' ,duration = ' + rowData.duration + ' where user_id = ' + userId ;
-					console.log("UPDATE for :");
-					console.log(rowData);
-				} else if(rows.length == 0) {
-					//isert a new entry
-          console.log("Insert here for ");
-          console.log(rowData);
+    	console.log("Current Row ");
+    	console.log(rowData);
+        
+		updateActivityLog(sql, rowData, 
+			function success() {
+				//check if all the updates are done...
+				var allComplete = true;
+				for( var j=0; j < numItems; j++) {
+					console.log("CHECK:");
+					console.log(data[j]);
+					if(data[j].isOK === false) {
+						allComplete = false;
+					}
+				}
+				
+				if(allComplete === true) {
+					console.log("ALL DONE!")
+					successCb();
+				} else {
+					console.log("WAITING!!")
 				}
 			},
-			function error(error) {
-				allOK = false;
+			function error() {
+				errorCb();
 			}
 		);
-		
-		if(allOK === true) {
-			successCb();
-		} else {
-			errorCb();
-		}
-		
 	}
 }
 
@@ -157,7 +209,7 @@ app.get('/', requireLogin, function (req, res) {
 //Activities Page - shows static list of activities
 app.get('/activities', function (req, res) {
   console.log('2. Session = '+req.session);
-	var callback = {
+    var callback = {
     success : function success(result) {
       activities = result;
       activitiesByCategory = _.groupBy(activities, function(activity){
@@ -177,32 +229,32 @@ app.get('/activities', function (req, res) {
 //Get login page
 app.get('/login',function(req, res){
   var now = new Date();
-	res.render('login');
+    res.render('login');
 });
 
 //Post login info
 app.post('/login',function(req, res){
   console.log('User name = '+req.body.username+', password is '+req.body.password);
-  	var callback = {
-		success: function success(username, user_id, team_id) {
-      		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      		req.session.email = username
-      		req.session.username = re.exec(username)[1];
-      		console.log("USER NAME IS - " + req.session.username)
-      		req.session.user_id = user_id;
-			    req.session.team_id = team_id;
-      		req.session.password = req.body.password;
-      		res.redirect('/activities');
-    	},
-    	error: function error(error) {
-      		// TODO: Preethi
-      		// Update login page to handle errors and make it pretty 
-      		res.render('login', {
-        		error: error
-      		})
-    	}
-	}
-  	findUser(req.body.username, req.body.password, callback); 
+    var callback = {
+        success: function success(username, user_id, team_id) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            req.session.email = username
+            req.session.username = re.exec(username)[1];
+            console.log("USER NAME IS - " + req.session.username)
+            req.session.user_id = user_id;
+                req.session.team_id = team_id;
+            req.session.password = req.body.password;
+            res.redirect('/activities');
+        },
+        error: function error(error) {
+            // TODO: Preethi
+            // Update login page to handle errors and make it pretty 
+            res.render('login', {
+                error: error
+            })
+        }
+    }
+    findUser(req.body.username, req.body.password, callback); 
 });
 
 // TODO: Preethi
@@ -217,7 +269,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
   if(req.session.username == req.params.username){
 
     var callback = {
-      success : function success(result) { 	
+      success : function success(result) {  
         var activities = result,
           today;
 
@@ -251,18 +303,18 @@ app.get('/:username/activities', requireLogin, function(req, res){
               activitiesByCategory: activitiesByCategory,
               displayDate: activityDate
             });
-		},
-		function error(err) {
-			//return error
+        },
+        function error(err) {
+            //return error
       res.end("no");
-		});
+        });
       },
       error : function error(err) {
-			 //return error
+             //return error
         res.end("no");
       }
     };
-	getAllActivitiesInfo(callback);
+    getAllActivitiesInfo(callback);
   } else {
     // TODO: Display this error message to the user 
     res.send('Username doesn\'t match the user logged in');
@@ -271,7 +323,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
 // post for the user activity
 app.post('/:username/activities', requireLogin, function(req, res){
-  	if(req.session.username == req.params.username){
+    if(req.session.username == req.params.username){
 
       var activityIdsToBeUpdated = req.body.activitySelected,
           activityDuration = _.filter(req.body.activityDuration, function(value){
@@ -302,14 +354,15 @@ app.post('/:username/activities', requireLogin, function(req, res){
       console.log(req.session);
       setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
       function success(result) {
-          res.end("yes");
+          	console.log("FINISHED!!!");
+			res.end("yes");
         },
       function error(err) {
           // TODO: Preethi handle error
           res.end("no");
         }
       );
-	   } else {
+       } else {
       // TODO: Display this error message to the user 
       res.send('Username doesn\'t match the user logged in');
     }
