@@ -29,6 +29,7 @@ CREATE TABLE `activityLog` (
   `date` varchar(40) not NULL,
   `team_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
+  `points` float(10,2) DEFAULT NULL,
   KEY `activity_id` (`activity_id`),
   KEY `team_id` (`team_id`),
   KEY `user_id` (`user_id`),
@@ -119,10 +120,10 @@ insert into userInfo (email, password, team_id) values ('test1@poshmark.com', 'p
 insert into teamMetaData (team_name) values ('test_team2');
 insert into userInfo (email, password, team_id) values ('test2@poshmark.com', 'password', 1);
 
-insert into activityLog( activity_id, duration, date, team_id, user_id) values (34, 24, '2016-1-3', 1, 1);
-insert into activityLog( activity_id, duration, date, team_id, user_id) values (27, 60, '2016-1-3', 1, 1);
-insert into activityLog( activity_id, duration, date, team_id, user_id) values (34, 10, '2016-1-2', 1, 1);
-insert into activityLog( activity_id, duration, date, team_id, user_id) values (27, 10, '2016-1-2', 1, 1);
+insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 24, '2016-1-3', 1, 1, .80 );
+insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 60, '2016-1-3', 1, 1, 4.00);
+insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 10, '2016-1-2', 1, 1, .33);
+insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 10, '2016-1-2', 1, 1, .67);
 
 
 --
