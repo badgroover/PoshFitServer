@@ -251,7 +251,7 @@ app.post('/login',function(req, res){
             req.session.user_id = user_id;
                 req.session.team_id = team_id;
             req.session.password = req.body.password;
-            res.redirect('/activities');
+            res.redirect('/dashboard');
         },
         error: function error(error) {
             // TODO: Preethi
@@ -266,8 +266,35 @@ app.post('/login',function(req, res){
 
 // TODO: Preethi
 //Dashboard page (team homepage and data for other teams)
-app.post('/dashboard', requireLogin, function(req, res){
-  res.end("yes");
+app.get('/dashboard', requireLogin, function(req, res){
+  var callback = {
+    success : function success(result) {
+      userTeamData = result;
+
+      getAllTeamStats(function success(result){
+        teamData = result;
+        res.render('dashboard', {
+          teamData: teamData,
+          userTeamData: userTeamData
+        });
+      }, 
+      function error(error){
+        //return error
+        res.end("no");
+      });
+
+
+    },
+    error : function error(err) {
+      res.send(err);
+    }
+  };
+  getTeamStats(req.session.user_id, req.session.team_id, callback);
+});
+
+// About page
+app.get("/about", requireLogin, function(req, res){
+    res.render('about');
 });
 
 //User activity page (you should be able to list all activities for a user and prompt to enter activities for that user)
@@ -312,8 +339,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
             });
         },
         function error(err) {
-            //return error
-      res.end("no");
+          //return error
+          res.end("no");
         });
       },
       error : function error(err) {
@@ -382,9 +409,6 @@ app.get('/logout', requireLogin, function(req, res){
   req.session.destroy();
   res.redirect('/login');
 });
-
-// TODO: Preethi
-// TODO: add a route for 404 
 
 // Error handlers
 

@@ -52,18 +52,24 @@ $(document).ready(function(){
       var today = new Date(),
       	  yesterday = new Date(),
       	  yesterdaysDate,
+      	  submissionDate,
       	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 
       yesterday.setDate(yesterday.getDate() - 1);
       yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
 
       if(activityDate === currentDate || activityDate === yesterdaysDate) {
-      	$(this).append('<input type="hidden" name="activityDate" value="'+ currentDate +'" /> ');	
+      	if(activityDate == currentDate){
+      		submissionDate = currentDate;
+      	} else {
+      		submissionDate = yesterdaysDate
+      	}
+      	
+      	$(this).append('<input type="hidden" name="activityDate" value="'+ submissionDate +'" /> ');	
       	return true;
       } else {
       	alert("Too late to submit data for " + activityDate + " !");
-      	// TODO: Preethi redirect to the dashboard page here 
-      	window.location.replace("/activities");
+      	window.location.replace("/dashboard");
       	return false;
       }
       
