@@ -92,18 +92,16 @@ function requireLogin(req, res, next) {
   }
 };
 
-var getUserActivityFor = function(id, startDate, successCb, errorCb) {
+var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
 	/*
 	get all rows from the activityLog table where,
 	the user_id = userName.id AND
 	the date is today.
 	*/
 	
-	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(startDate);
+	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(activityDate);
 	queryHelper.runQuery(getUserId, 
 		function success(rows) {
-			console.log("UserInfo data");
-			console.log(rows);
 			successCb(rows);
 		},
 		function error(error) {
@@ -113,22 +111,25 @@ var getUserActivityFor = function(id, startDate, successCb, errorCb) {
 }
 
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
-	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId;
+	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
 	var numItems = data.length;
-	boolean allOK = true;
+	var allOK = true;
 	for(var i=0; (i< numItems && allOK == true); i++) {
 		var rowData = data[i];
+    console.log("Current Row ");
+    console.log(rowData);
 		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
-		console.log(sql);
 		queryHelper.runQuery(sql,
 			function success (rows) {
 				if(rows.length == 1) {
 					//found a prev entry...update..
 					var updateSql = 'update activityLog set date = ' + queryHelper.esc(rowData.date) + ' ,duration = ' + rowData.duration + ' where user_id = ' + userId ;
-					console.log("UPDATE SQL:")
-					console.log(updateSql;)
+					console.log("UPDATE for :");
+					console.log(rowData);
 				} else if(rows.length == 0) {
 					//isert a new entry
+          console.log("Insert here for ");
+          console.log(rowData);
 				}
 			},
 			function error(error) {
@@ -136,24 +137,13 @@ var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
 			}
 		);
 		
-		if(allOK ==true) {
+		if(allOK === true) {
 			successCb();
 		} else {
 			errorCb();
 		}
 		
 	}
-	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(startDate);
-	queryHelper.runQuery(getUserId, 
-		function success(rows) {
-			console.log("UserInfo data");
-			console.log(rows);
-			successCb(rows);
-		},
-		function error(error) {
-			console.log(error);
-	     	return errorCb();
-	});
 }
 
 //---------------------------------Routes-----------------------------
@@ -200,7 +190,7 @@ app.post('/login',function(req, res){
       		req.session.username = re.exec(username)[1];
       		console.log("USER NAME IS - " + req.session.username)
       		req.session.user_id = user_id;
-			req.session.team_id = team_id;
+			    req.session.team_id = team_id;
       		req.session.password = req.body.password;
       		res.redirect('/activities');
     	},
@@ -229,29 +219,21 @@ app.get('/:username/activities', requireLogin, function(req, res){
     var callback = {
       success : function success(result) { 	
         var activities = result,
-          today = new Date(),
-          yesterday = new Date(),
-          dayBeforeYesterday = new Date(),
-          displayDate;
+          today;
 
-        yesterday.setDate(today.getDate() - 1);
-        dayBeforeYesterday.setDate(yesterday.getDate() -1);
-        // TODO: Preethi set the time correctly here based on query params i.e 'today' or 'yesterday'
-        if(req.query.for == "today"){
-          startDate = yesterday.toISOString();
-          endDate = today.toISOString();
-          displayDate = today;
+        if(req.query.for) {
+          activityDate = req.query.for;  
         } else {
-          startDate = dayBeforeYesterday.toISOString();
-          endDate = yesterday.toISOString();
-          displayDate = yesterday;
+          today = new Date();
+          activityDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
         }
 
-        // Remove this hardcoded value after testing
-		startDate = '2015-12-27T08:0:00.000Z';
-        getUserActivityFor(req.session.user_id, startDate,  
-        function success(result) {
+        getUserActivityFor(req.session.user_id, activityDate, 
+          function success(result) {
+
             userActivities = result;
+            console.log("USER ACTIVITIES");
+            console.log(userActivities);
             _.each(activities, function(activity){
               matchedActivity = _.find(userActivities, function(userActivity){
                 return userActivity.activity_id == activity.id
@@ -265,45 +247,73 @@ app.get('/:username/activities', requireLogin, function(req, res){
               return activity.Category;
             });
 
-            // Send response of activities here
-            // TODO: Preethi 
-
             res.render('user/activities', {
               activitiesByCategory: activitiesByCategory,
-              displayDate: displayDate
+              displayDate: activityDate
             });
 		},
 		function error(err) {
 			//return error
+      res.end("no");
 		});
       },
       error : function error(err) {
-			//return error
+			 //return error
+        res.end("no");
       }
     };
 	getAllActivitiesInfo(callback);
   } else {
+    // TODO: Display this error message to the user 
     res.send('Username doesn\'t match the user logged in');
   }
 });
 
 // post for the user activity
 app.post('/:username/activities', requireLogin, function(req, res){
-    res.end("yes");
-    console.log("IN HERE");
-    console.log(req.body);
-    console.log(req.body.params);
   	if(req.session.username == req.params.username){
-	
-	}
-	setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
-		function success(result) {
-			  res.end("yes");
-      	},
-      	function error(err) {
-			  res.end("no");
-      	}
-	);
+
+      var activityIdsToBeUpdated = req.body.activitySelected,
+          activityDuration = _.filter(req.body.activityDuration, function(value){
+              return value !== "";
+          }),
+          activityDate = req.body.activityDate,
+          activityPoints = _.filter(req.body.activityTotalPoints, function(value){
+              return value !== "";
+          }),
+          activityData = [];
+
+      console.log(req.body);
+      _.each(activityIdsToBeUpdated, function(activityId, i) {
+        activityData.push({
+          "activityId": activityId,
+          "duration": activityDuration[i],
+          "points": activityPoints[i],
+          "date": activityDate
+        });
+      });
+
+      console.log("Activity Data  " + activityData);
+      _.each(activityData, function(data) {
+        console.log(data);
+      });
+
+      console.log("SESSION");
+      console.log(req.session);
+      setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
+      function success(result) {
+          res.end("yes");
+        },
+      function error(err) {
+          // TODO: Preethi handle error
+          res.end("no");
+        }
+      );
+	   } else {
+      // TODO: Display this error message to the user 
+      res.send('Username doesn\'t match the user logged in');
+    }
+
 });
 
 // Logout

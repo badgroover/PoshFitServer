@@ -1,12 +1,14 @@
 <!-- views/partials/header.ejs -->
-
+<head>
+	<script type="text/javascript" src="/javascript/header.js"></script>
+</head>
 <nav class="navbar navbar-default" role="navigation">
     <div class="container-fluid">
 
         <ul class="nav navbar-nav">
             <li><a href="/">Dashboard</a></li>
-            <li><a href="/<%= session.username%>/activities?for=today">Update Today's Activities</a></li>
-            <li><a href="/<%= session.username%>/activities?for=yesterday">Update Yesterday's Activities</a></li>
+            <li><a id="nav-today" href="/<%= session.username%>/activities">Update Today's Activities</a></li>
+            <li><a id="nav-yesterday" href="/<%= session.username%>/activities">Update Yesterday's Activities</a></li>
             <li><a href="/about">About</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>

@@ -4,6 +4,9 @@
     <% include ../partials/head %>
     <title>Poshfit Challange Activities</title>
     <script type="text/javascript" src="/javascript/activities.js"></script>
+    <script>
+  		var activityDate = "<%= displayDate %>";
+	</script>
   </head>
   <body class="container">
     <header>
@@ -13,7 +16,6 @@
 	<h2>Update Activities - <%= displayDate %></h2>
 
 	<form id="activity-form" class="form-horizontal" action="/<%= session.username %>/activities" method="post">
-		<input id="activity-date" type="hidden" name="activityDate">
 		<table class="table table-condensed table-hover table-bordered">
 		<% Object.keys(activitiesByCategory).forEach(function(category){ %>
 			<tr>
@@ -39,7 +41,7 @@
 						<td><input id="user-duration" type="text" number=true value="" name="activityDuration" ></td>
 						
 					<% } %>
-					<td><input id="total-points" type="text" value="" name="activityTotalPoints" disabled></td>
+					<td><input id="total-points" type="text" value="" name="activityTotalPoints" readonly></td>
 				</tr>
 			<% }) %>
 		<% }) %>

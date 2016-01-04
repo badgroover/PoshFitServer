@@ -32,7 +32,7 @@ $(document).ready(function(){
 
 	// Update points for previously entered actitivites 
 
-	updateTotalPoints();
+	// updateTotalPoints();
 
 	// Update total points when the user selects an activity
 
@@ -58,13 +58,22 @@ $(document).ready(function(){
  	// add the date stamp before form submit
 
  	$("#activity-form").submit( function(eventObj) {
-      // $('<input />').attr('type', 'hidden')
-      //     .attr('name', "something")
-      //     .attr('value', "something")
-      //     .appendTo('#form');
+ 		
+      // Get current time and check it against the time with which the page was loaded.
+      var today = new Date(),
+      	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 
-      $(this).append('<input type="hidden" name="activityDate" value="'+new Date().toISOString()+'" /> ');
-      return true;
+      if(activityDate === currentDate) {
+      	$(this).append('<input type="hidden" name="activityDate" value="'+ currentDate +'" /> ');	
+      	return true;
+      } else {
+      	// TODO: Preethi Check that you can update yesterday's data
+      	alert("Too late to submit data for " + activityDate + " !");
+      	// TODO: Preethi redirect to the dashboard page here 
+      	window.location.replace("/activities");
+      	return false;
+      }
+      
   	});
 
 });
