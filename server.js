@@ -113,25 +113,34 @@ var getUserActivityFor = function(id, startDate, successCb, errorCb) {
 }
 
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
-	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId  + ' team_id = ' + team_id;
-
+	var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId;
 	var numItems = data.length;
-	for(var i=0; i< numItems; i++) {
+	boolean allOK = true;
+	for(var i=0; (i< numItems && allOK == true); i++) {
 		var rowData = data[i];
-		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activity_id + ' and date = ' + queryHelper.esc(rowData.date);
+		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
 		console.log(sql);
 		queryHelper.runQuery(sql,
 			function success (rows) {
 				if(rows.length == 1) {
 					//found a prev entry...update..
+					var updateSql = 'update activityLog set date = ' + queryHelper.esc(rowData.date) + ' ,duration = ' + rowData.duration + ' where user_id = ' + userId ;
+					console.log("UPDATE SQL:")
+					console.log(updateSql;)
 				} else if(rows.length == 0) {
 					//isert a new entry
 				}
 			},
 			function error(error) {
-				
+				allOK = false;
 			}
 		);
+		
+		if(allOK ==true) {
+			successCb();
+		} else {
+			errorCb();
+		}
 		
 	}
 	var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(startDate);
