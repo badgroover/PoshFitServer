@@ -34,11 +34,19 @@
 					<td id="activity-points" data-activity-points=<%= activity.Points%> data-activity-duration=<%= activity.Duration%>><%= activity.Points %> for <%= activity.Duration %> minutes</td>
 					<% if(activity.userActivity){ %>
 						<td><input id="user-selected" type="checkbox" value=<%= activity.id%> name="activitySelected" checked></td>
-						<td><input id="user-duration" type="text" number=true value=<%= activity.userActivity.duration %> name="activityDuration" ></td>
+						<% if(activity.Duration === 0) { %>
+							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" disabled></td>
+						<% } else { %>
+							<td><input id="user-duration" type="text" number=true value=<%= activity.userActivity.duration %> name="activityDuration" ></td>
+						<% } %>
 						<td><input id="total-points" type="text" value=<%= activity.userActivity.points %> name="activityTotalPoints" readonly></td>
 					<% }else{ %>
 						<td><input id="user-selected" type="checkbox" value=<%= activity.id%> name="activitySelected" ></td>
-						<td><input id="user-duration" type="text" number=true value="" name="activityDuration" ></td>
+						<% if(activity.Duration === 0) { %>
+							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" disabled></td>
+						<% } else { %>
+							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" ></td>
+						<% } %>
 						<td><input id="total-points" type="text" value="" name="activityTotalPoints" readonly></td>
 					<% } %>
 				</tr>

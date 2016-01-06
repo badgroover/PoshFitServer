@@ -6,7 +6,7 @@ var updateTotalPointsFor = function(selection) {
 	if(userDuration || activityDuration == 0) {
 		var totalPoints;
 		if(activityDuration == 0){
-			totalPoints = userDuration * activityPointsPerDuration;	
+			totalPoints = activityPointsPerDuration;	
 		} else {
 			totalPoints = (userDuration * activityPointsPerDuration)/activityDuration;	
 		}
@@ -35,9 +35,8 @@ $(document).ready(function(){
 	});
 
 	// Update total points if user activity duration is entered and user selects activity
-	// TODO: Preethi update points on lose focus?
-
-	$("table #activities #user-duration").change(function(){
+	
+	$("table #activities #user-duration").on('change textInput input', function(){ 
 		checkbox = $(this).parent().parent().find("#user-selected:checked");
 		if(checkbox.length > 0) {
 			updateTotalPointsFor(checkbox);
