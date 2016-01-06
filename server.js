@@ -71,7 +71,7 @@ var findUser = function(username, password, callback) {
         },
         function error(error) {
             console.log("Failed Here!");
-      callback.error("Something went wrong. Please try logging in later");
+            callback.error("Something went wrong. Please try logging in later");
     });
 }
 
@@ -238,7 +238,9 @@ app.get('/activities', function (req, res) {
 //Get login page
 app.get('/login',function(req, res){
   var now = new Date();
-    res.render('login');
+    res.render('login', {
+        error: ""
+    });
 });
 
 //Post login info
@@ -256,8 +258,6 @@ app.post('/login',function(req, res){
             res.redirect('/dashboard');
         },
         error: function error(error) {
-            // TODO: Preethi
-            // Update login page to handle errors and make it pretty 
             res.render('login', {
                 error: error
             })
@@ -294,7 +294,7 @@ app.get('/dashboard', requireLogin, function(req, res){
   getTeamStats(req.session.user_id, req.session.team_id, callback);
 });
 
-// About page
+//About page
 app.get("/about", requireLogin, function(req, res){
     res.render('about');
 });
@@ -346,7 +346,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
         });
       },
       error : function error(err) {
-             //return error
+        //return error
         res.end("no");
       }
     };
@@ -357,7 +357,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
   }
 });
 
-// post for the user activity
+//Post for the user activity
 app.post('/:username/activities', requireLogin, function(req, res){
     if(req.session.username == req.params.username){
 
@@ -386,19 +386,23 @@ app.post('/:username/activities', requireLogin, function(req, res){
         console.log(data);
       });
 
-      console.log("SESSION");
-      console.log(req.session);
-      setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
-      function success(result) {
-          	console.log("FINISHED!!!");
-			res.end("yes");
-        },
-      function error(err) {
-          // TODO: Preethi handle error
-          res.end("no");
-        }
-      );
-       } else {
+      if(activityData.length > 0) {
+        setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
+          function success(result) {
+            console.log("FINISHED!!!");
+            res.end("yes");
+          },
+          function error(err) {
+            // TODO: Preethi handle error
+            res.end("no");
+          });
+      } else {
+        console.log("DID NOT UPDATE ANYTHING!!!");
+        res.end("yes");
+      }
+
+
+    } else {
       // TODO: Display this error message to the user 
       res.send('Username doesn\'t match the user logged in');
     }
