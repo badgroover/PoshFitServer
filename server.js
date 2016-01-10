@@ -108,6 +108,25 @@ var getTotalPointsForTeam = function(req, cb) {
     });
 }
 
+var getTotalPointsForByTeamMembers = function(req, cb) {
+    var queryString = 'SELECT SUM(points) as total_points,  team_name, email FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id LEFT JOIN userInfo ON activityLog.user_id=userInfo.id WHERE activityLog.team_id = ' + req.session.team_id + " GROUP BY user_id";
+    queryHelper.runQuery(queryString, 
+        function success(rows) {
+            if(rows.length !== 0) {
+                console.log("Team Total By individuals");
+				console.log(rows);
+                return cb.success("yes");         
+            } else {
+                //This team has no points
+				var emptyRowsArray = [];
+                return cb.success("0");         
+            }
+        },
+        function error(error) {
+            return cb.error();
+    });
+}
+
 var getTotalPointsForAllTeam = function(req, cb) {
     var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
     queryHelper.runQuery(queryString, 
@@ -161,8 +180,9 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
             
             //Duration is undefined for Wellbeing and Consumption activities
             //Hack to give it a ruration. Maybe client sents 60?
-            if (typeof rowData.duration === 'undefined') {
-                rowData.duration = 60;
+            console.log(rowData);
+			if (typeof rowData.duration === 'undefined') {
+                rowData.duration = 0;
             }
                 
             if(rowData.deleted === true) {
@@ -312,10 +332,10 @@ app.post('/login',function(req, res){
 app.get('/dashboard', requireLogin, function(req, res){
     var callback = {
         success : function success(result) {
-            res.end(result);
-            userTeamData = result;
-            
-            //             getAllTeamStats(
+            // res.end(result);
+            // userTeamData = result;
+            // 
+            //  getAllTeamStats(
             //  function success(result){
             //                  teamData = result;
             //                  res.render('dashboard', {
@@ -330,12 +350,13 @@ app.get('/dashboard', requireLogin, function(req, res){
             // );
         },
         error : function error(err) {
-            res.send(err);
+//            res.send(err);
             }
         };
         //getTeamStats(req.session.user_id, req.session.team_id, callback);
+		getTotalPointsForByTeamMembers(req, callback);
         //getTotalPointsForTeam(req, callback);
-        getTotalPointsForAllTeam(req, callback);
+        //getTotalPointsForAllTeam(req, callback);
 });
 
 //About page
