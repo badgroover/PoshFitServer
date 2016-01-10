@@ -43,7 +43,7 @@ app.use(function(req, res, next) {
 // via settings['verbose errors']
 app.enable('verbose errors');
 // disable them in production
-if(argv.e != "dev") app.disable('verbose errors');
+//if(argv.e != "dev") app.disable('verbose errors');
 
 var server = app.listen(envConfig.port, function () {
   var host = server.address().address,
@@ -90,6 +90,44 @@ var getAllActivitiesInfo = function(cb) {
     });
 }
 
+var getTotalPointsForTeam = function(req, cb) {
+    var queryString = 'SELECT SUM(points) as total_points FROM activityLog WHERE team_id = ' + req.session.team_id;
+    queryHelper.runQuery(queryString, 
+        function success(rows) {
+			if(rows.length == 1 && rows[0]["SUM(points)"] !== null) {
+				console.log("Team Total");
+				console.log(rows[0]["SUM(points)"]);
+	            return cb.success("" + rows[0]["SUM(points)"]);			
+			} else {
+				//This team has no points
+				return cb.success("0");			
+			}
+        },
+        function error(error) {
+            return cb.error();
+    });
+}
+
+var getTotalPointsForAllTeam = function(req, cb) {
+    var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
+    queryHelper.runQuery(queryString, 
+        function success(rows) {
+			if(rows.length !== 0) {
+				console.log("Team Total");
+				console.log(rows[0]);
+				console.log(rows[0].team_name);
+	            return cb.success("OK");			
+			} else {
+				//This team has no points..return error?
+				return cb.success("0");			
+			}
+        },
+        function error(error) {
+            return cb.error();
+    });
+}
+
+
 // Redirect to login if you are not logged in
 function requireLogin(req, res, next) {
   if (req.session && req.session.email) {
@@ -119,48 +157,51 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
 var updateActivityLog = function(sql, rowData, successCb, errorCb) {
     queryHelper.runQuery(sql,
         function success (rows) {
-            if(rows.length == 1) {
-                //found a prev entry...update..
-                var updateSql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
-								 ' ,duration = ' + rowData.duration,
-								 ' ,points = ' + rowData.points,
-								 ' where user_id = ' + rowData.userId ,
-								 ' and activity_id = ' + rowData.activityId,
-								 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
-                console.log("UPDATE for :");
-                console.log(rowData);
-				queryHelper.runQuery(updateSql, 
-					function success() {
-						rowData.isOK = true;
-						successCb();
-					},
-					function error() {
-						rowData.isOK = false;
-						errorCb();
-					})
-            } else if(rows.length == 0) {
-                var insertSql = [	
-									'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
-								 	rowData.userId + ',',
-									rowData.teamId + ',',
-									rowData.activityId + ',',
-									rowData.duration + ',',
-								 	rowData.points + ',',
-									queryHelper.esc(rowData.date) + ')'
-								].join(' ');
-                console.log("INSERT SQL :");
-                console.log(insertSql);
-				queryHelper.runQuery(insertSql, 
-					function success() {
-						rowData.isOK = true;
-						successCb();
-					},
-					function error() {
-						rowData.isOK = true;
-						errorCb();
-					})
-				successCb();
+            var sql;
+            
+            //Duration is undefined for Wellbeing and Consumption activities
+            //Hack to give it a ruration. Maybe client sents 60?
+            if (typeof rowData.duration === 'undefined') {
+                rowData.duration = 60;
             }
+                
+            if(rowData.deleted === true) {
+                //clear out this row
+            } else {
+                if(rows.length == 1) {
+                    //found a prev entry...update..
+                    sql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
+                                 ' ,duration = ' + rowData.duration,
+                                 ' ,points = ' + rowData.points,
+                                 ' where user_id = ' + rowData.userId ,
+                                 ' and activity_id = ' + rowData.activityId,
+                                 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
+                    console.log("UPDATE for :");
+                    console.log(rowData);
+                } else if(rows.length == 0) {
+                    //new row...insert..
+                    sql = [
+                            'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
+                            rowData.userId + ',',
+                            rowData.teamId + ',',
+                            rowData.activityId + ',',
+                            rowData.duration + ',',
+                            rowData.points + ',',
+                            queryHelper.esc(rowData.date) + ')'].join(' ');
+                    console.log("INSERT SQL :");
+                    console.log(sql);
+                }
+            }
+            queryHelper.runQuery(sql, 
+                function success() {
+                    rowData.isOK = true;
+                    successCb();
+                },
+                function error() {
+                    rowData.isOK = false;
+                    errorCb();
+                })
+            
         },
         function error(error) {
             errorCb();
@@ -170,41 +211,41 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
     var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
 
-	var numItems = data.length;
+    var numItems = data.length;
 
-	for(var i=0; (i< numItems); i++) {
-    	var rowData = data[i];
-		rowData.userId = userId;
-		rowData.teamId = teamId;
-		rowData.isOK = false;
-		var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
-    	console.log("Current Row ");
-    	console.log(rowData);
+    for(var i=0; (i< numItems); i++) {
+        var rowData = data[i];
+        rowData.userId = userId;
+        rowData.teamId = teamId;
+        rowData.isOK = false;
+        var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
+        console.log("Current Row ");
+        console.log(rowData);
         
-		updateActivityLog(sql, rowData, 
-			function success() {
-				//check if all the updates are done...
-				var allComplete = true;
-				for( var j=0; j < numItems; j++) {
-					console.log("CHECK:");
-					console.log(data[j]);
-					if(data[j].isOK === false) {
-						allComplete = false;
-					}
-				}
-				
-				if(allComplete === true) {
-					console.log("ALL DONE!")
-					successCb();
-				} else {
-					console.log("WAITING!!")
-				}
-			},
-			function error() {
-				errorCb();
-			}
-		);
-	}
+        updateActivityLog(sql, rowData, 
+            function success() {
+                //check if all the updates are done...
+                var allComplete = true;
+                for( var j=0; j < numItems; j++) {
+                    console.log("CHECK:");
+                    console.log(data[j]);
+                    if(data[j].isOK === false) {
+                        allComplete = false;
+                    }
+                }
+                
+                if(allComplete === true) {
+                    console.log("ALL DONE!")
+                    successCb();
+                } else {
+                    console.log("WAITING!!")
+                }
+            },
+            function error() {
+                errorCb();
+            }
+        );
+    }
 }
 
 //---------------------------------Routes-----------------------------
@@ -269,29 +310,32 @@ app.post('/login',function(req, res){
 // TODO: Preethi
 //Dashboard page (team homepage and data for other teams)
 app.get('/dashboard', requireLogin, function(req, res){
-  var callback = {
-    success : function success(result) {
-      userTeamData = result;
-
-      getAllTeamStats(function success(result){
-        teamData = result;
-        res.render('dashboard', {
-          teamData: teamData,
-          userTeamData: userTeamData
-        });
-      }, 
-      function error(error){
-        //return error
-        res.end("no");
-      });
-
-
-    },
-    error : function error(err) {
-      res.send(err);
-    }
-  };
-  getTeamStats(req.session.user_id, req.session.team_id, callback);
+    var callback = {
+        success : function success(result) {
+			res.end(result);
+            userTeamData = result;
+            
+			//             getAllTeamStats(
+			// 	function success(result){
+			//                 	teamData = result;
+			//                 	res.render('dashboard', {
+			//                     teamData: teamData,
+			//                     userTeamData: userTeamData
+			//                 	});
+			//             	}, 
+			//             	function error(error){
+			//                 	//return error
+			//                 	res.end("no");
+			//             	}
+			// );
+        },
+        error : function error(err) {
+            res.send(err);
+            }
+        };
+        //getTeamStats(req.session.user_id, req.session.team_id, callback);
+        //getTotalPointsForTeam(req, callback);
+		getTotalPointsForAllTeam(req, callback);
 });
 
 //About page
