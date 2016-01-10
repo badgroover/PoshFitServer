@@ -6,6 +6,7 @@ var updateTotalPointsFor = function(selection) {
 	if(userDuration || activityDuration == 0) {
 		var totalPoints;
 		if(activityDuration == 0){
+			$(row).find("#user-duration").val("0");
 			totalPoints = activityPointsPerDuration;	
 		} else {
 			totalPoints = (userDuration * activityPointsPerDuration)/activityDuration;	
@@ -76,6 +77,10 @@ $(document).ready(function(){
       	} else {
       		submissionDate = yesterdaysDate
       	}
+
+
+		//TODO: Preethi 
+		// check if all selected values have duration and points calculated
 
 		var formValue = {};
 		$.each($(form).serializeArray(), function(i, field) {

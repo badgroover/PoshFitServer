@@ -35,7 +35,7 @@
 					<% if(activity.userActivity){ %>
 						<td><input id="user-selected" type="checkbox" value=<%= activity.id%> name="activitySelected" checked></td>
 						<% if(activity.Duration === 0) { %>
-							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" disabled></td>
+							<td><input id="user-duration" type="text" number=true value=<%= activity.userActivity.duration %> name="activityDuration" readonly></td>
 						<% } else { %>
 							<td><input id="user-duration" type="text" number=true value=<%= activity.userActivity.duration %> name="activityDuration" ></td>
 						<% } %>
@@ -43,7 +43,7 @@
 					<% }else{ %>
 						<td><input id="user-selected" type="checkbox" value=<%= activity.id%> name="activitySelected" ></td>
 						<% if(activity.Duration === 0) { %>
-							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" disabled></td>
+							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" readonly></td>
 						<% } else { %>
 							<td><input id="user-duration" type="text" number=true value="" name="activityDuration" ></td>
 						<% } %>
