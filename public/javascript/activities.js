@@ -22,6 +22,18 @@ var clearTotalPointsFor = function(selection) {
 
 $(document).ready(function(){
 
+	var selectedActivityIds = [];
+
+	// keep track of the selections on page load in case it is delselected later (will need to be deleted)
+
+	$("table #activities #user-selected:checked").each(function(){
+		var row = $(this).parent().parent(),
+			activityId = $(row).find("#activity").data("activity-id");
+		selectedActivityIds.push(activityId);
+	});
+
+	console.log(selectedActivityIds);
+
 	// Update total points when the user selects an activity
 
 	$("table #activities #user-selected").change(function(){
@@ -35,7 +47,7 @@ $(document).ready(function(){
 	});
 
 	// Update total points if user activity duration is entered and user selects activity
-	
+
 	$("table #activities #user-duration").on('change textInput input', function(){ 
 		checkbox = $(this).parent().parent().find("#user-selected:checked");
 		if(checkbox.length > 0) {
@@ -52,7 +64,8 @@ $(document).ready(function(){
       	  yesterday = new Date(),
       	  yesterdaysDate,
       	  submissionDate,
-      	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+      	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(),
+      	  form = $("#activity-form");
 
       yesterday.setDate(yesterday.getDate() - 1);
       yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
@@ -63,6 +76,25 @@ $(document).ready(function(){
       	} else {
       		submissionDate = yesterdaysDate
       	}
+
+		var formValue = {};
+		$.each($(form).serializeArray(), function(i, field) {
+			if(field.name === "activitySelected") {
+				if(formValue[field.name]) {
+					formValue[field.name].push(field.value);		
+				} else {
+					formValue[field.name] = [];
+					formValue[field.name].push(field.value);
+				}	
+			}
+		});
+
+		// check if any selected activities are unselected 
+    	$.each(selectedActivityIds, function( index, value ) {
+  			if($.inArray(value.toString(), formValue["activitySelected"]) == -1){
+				$(form).append('<input name="activityIdDeleted" value="'+ value +'" /> ');	
+  			}
+		});
       	
       	$(this).append('<input type="hidden" name="activityDate" value="'+ submissionDate +'" /> ');	
       	return true;

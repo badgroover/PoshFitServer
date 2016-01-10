@@ -426,7 +426,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 app.post('/:username/activities', requireLogin, function(req, res){
     if(req.session.username == req.params.username){
 
-      var activityIdsToBeUpdated = req.body.activitySelected,
+      var activityIdsToBeUpdated,
           activityDuration = _.filter(req.body.activityDuration, function(value){
               return value !== "";
           }),
@@ -434,17 +434,53 @@ app.post('/:username/activities', requireLogin, function(req, res){
           activityPoints = _.filter(req.body.activityTotalPoints, function(value){
               return value !== "";
           }),
+          activityIdsDeleted,
           activityData = [];
 
-      console.log(req.body);
-      _.each(activityIdsToBeUpdated, function(activityId, i) {
-        activityData.push({
-          "activityId": activityId,
-          "duration": activityDuration[i],
-          "points": activityPoints[i],
-          "date": activityDate
-        });
-      });
+
+     console.log("Request ");
+     console.log(req.body);
+
+     if(req.body.activitySelected){
+        console.log("In selected");
+        if(req.body.activitySelected instanceof Array) {
+            activityIdsToBeUpdated = req.body.activitySelected;
+        } else {
+            activityIdsToBeUpdated = [req.body.activitySelected];
+        }
+     }
+
+     if(req.body.activityIdDeleted){
+        console.log("In deleted");
+        if(req.body.activityIdDeleted instanceof Array) {
+            activityIdsToBeUpdated = req.body.activitySelected;
+        } else {
+            activityIdsDeleted = [req.body.activityIdDeleted];
+        }
+     }
+
+      if(activityIdsToBeUpdated && activityIdsToBeUpdated.length > 0) {
+          _.each(activityIdsToBeUpdated, function(activityId, i) {
+            activityData.push({
+              "activityId": activityId,
+              "duration": activityDuration[i],
+              "points": activityPoints[i],
+              "date": activityDate
+            });
+          });
+      }
+
+      if(activityIdsDeleted && activityIdsDeleted.length > 0) {
+        _.each(activityIdsDeleted, function(activityId, i){
+            activityData.push({
+              "activityId": activityId,
+              "duration": 0,
+              "points": 0.0,
+              "date": activityDate,
+              "deleted": true
+            });
+          })
+      }
 
       console.log("Activity Data  " + activityData);
       _.each(activityData, function(data) {
