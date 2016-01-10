@@ -115,7 +115,7 @@ var getTotalPointsForByTeamMembers = function(req, cb) {
             if(rows.length !== 0) {
                 console.log("Team Total By individuals");
 				console.log(rows);
-                return cb.success("yes");         
+                return cb.success(rows);         
             } else {
                 //This team has no points
 				var emptyRowsArray = [];
@@ -135,7 +135,7 @@ var getTotalPointsForAllTeam = function(req, cb) {
                 console.log("Team Total");
                 console.log(rows[0]);
                 console.log(rows[0].team_name);
-                return cb.success("OK");            
+                return cb.success(rows);            
             } else {
                 //This team has no points..return error?
                 return cb.success("0");         
@@ -314,7 +314,7 @@ app.post('/login',function(req, res){
             req.session.username = re.exec(username)[1];
             console.log("USER NAME IS - " + req.session.username)
             req.session.user_id = user_id;
-                req.session.team_id = team_id;
+            req.session.team_id = team_id;
             req.session.password = req.body.password;
             res.redirect('/dashboard');
         },
@@ -327,36 +327,36 @@ app.post('/login',function(req, res){
     findUser(req.body.username, req.body.password, callback); 
 });
 
-// TODO: Preethi
 //Dashboard page (team homepage and data for other teams)
 app.get('/dashboard', requireLogin, function(req, res){
-    var callback = {
-        success : function success(result) {
-            // res.end(result);
-            // userTeamData = result;
-            // 
-            //  getAllTeamStats(
-            //  function success(result){
-            //                  teamData = result;
-            //                  res.render('dashboard', {
-            //                     teamData: teamData,
-            //                     userTeamData: userTeamData
-            //                  });
-            //              }, 
-            //              function error(error){
-            //                  //return error
-            //                  res.end("no");
-            //              }
-            // );
-        },
-        error : function error(err) {
-//            res.send(err);
-            }
-        };
-        //getTeamStats(req.session.user_id, req.session.team_id, callback);
-		getTotalPointsForByTeamMembers(req, callback);
-        //getTotalPointsForTeam(req, callback);
-        //getTotalPointsForAllTeam(req, callback);
+ //    var callback = {
+ //        success : function success(result) {
+ //            console.log("Team result");
+ //            console.log(result);
+ //            userTeamData = result;
+            
+ //            getTotalPointsForAllTeam(req, 
+ //             function success(result){
+ //                 teamData = result;
+ //                 console.log("All Teams result");
+ //                 console.log(teamData);
+ //                 res.render('dashboard', {
+ //                    teamData: teamData,
+ //                    userTeamData: userTeamData
+ //                 });
+ //              }, 
+ //             function error(error){
+ //                 //return error
+ //                 res.end("no");
+ //             });
+ //        },
+ //        error : function error(err) {
+ //            // res.send(err);
+ //            res.end("no");
+ //        }
+ //        };
+	// getTotalPointsForByTeamMembers(req, callback);
+    res.end("yes");
 });
 
 //About page
@@ -453,7 +453,7 @@ app.post('/:username/activities', requireLogin, function(req, res){
      if(req.body.activityIdDeleted){
         console.log("In deleted");
         if(req.body.activityIdDeleted instanceof Array) {
-            activityIdsToBeUpdated = req.body.activitySelected;
+            activityIdsDeleted = req.body.activityIdDeleted;
         } else {
             activityIdsDeleted = [req.body.activityIdDeleted];
         }
