@@ -94,14 +94,14 @@ var getTotalPointsForTeam = function(req, cb) {
     var queryString = 'SELECT SUM(points) as total_points FROM activityLog WHERE team_id = ' + req.session.team_id;
     queryHelper.runQuery(queryString, 
         function success(rows) {
-			if(rows.length == 1 && rows[0]["SUM(points)"] !== null) {
-				console.log("Team Total");
-				console.log(rows[0]["SUM(points)"]);
-	            return cb.success("" + rows[0]["SUM(points)"]);			
-			} else {
-				//This team has no points
-				return cb.success("0");			
-			}
+            if(rows.length == 1 && rows[0]["SUM(points)"] !== null) {
+                console.log("Team Total");
+                console.log(rows[0]["SUM(points)"]);
+                return cb.success("" + rows[0]["SUM(points)"]);         
+            } else {
+                //This team has no points
+                return cb.success("0");         
+            }
         },
         function error(error) {
             return cb.error();
@@ -112,15 +112,15 @@ var getTotalPointsForAllTeam = function(req, cb) {
     var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
     queryHelper.runQuery(queryString, 
         function success(rows) {
-			if(rows.length !== 0) {
-				console.log("Team Total");
-				console.log(rows[0]);
-				console.log(rows[0].team_name);
-	            return cb.success("OK");			
-			} else {
-				//This team has no points..return error?
-				return cb.success("0");			
-			}
+            if(rows.length !== 0) {
+                console.log("Team Total");
+                console.log(rows[0]);
+                console.log(rows[0].team_name);
+                return cb.success("OK");            
+            } else {
+                //This team has no points..return error?
+                return cb.success("0");         
+            }
         },
         function error(error) {
             return cb.error();
@@ -312,22 +312,22 @@ app.post('/login',function(req, res){
 app.get('/dashboard', requireLogin, function(req, res){
     var callback = {
         success : function success(result) {
-			res.end(result);
+            res.end(result);
             userTeamData = result;
             
-			//             getAllTeamStats(
-			// 	function success(result){
-			//                 	teamData = result;
-			//                 	res.render('dashboard', {
-			//                     teamData: teamData,
-			//                     userTeamData: userTeamData
-			//                 	});
-			//             	}, 
-			//             	function error(error){
-			//                 	//return error
-			//                 	res.end("no");
-			//             	}
-			// );
+            //             getAllTeamStats(
+            //  function success(result){
+            //                  teamData = result;
+            //                  res.render('dashboard', {
+            //                     teamData: teamData,
+            //                     userTeamData: userTeamData
+            //                  });
+            //              }, 
+            //              function error(error){
+            //                  //return error
+            //                  res.end("no");
+            //              }
+            // );
         },
         error : function error(err) {
             res.send(err);
@@ -335,7 +335,7 @@ app.get('/dashboard', requireLogin, function(req, res){
         };
         //getTeamStats(req.session.user_id, req.session.team_id, callback);
         //getTotalPointsForTeam(req, callback);
-		getTotalPointsForAllTeam(req, callback);
+        getTotalPointsForAllTeam(req, callback);
 });
 
 //About page
