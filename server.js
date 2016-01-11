@@ -118,17 +118,12 @@ var getTotalPointsForTeamMembers = function(req, cb) {
             if(rows.length !== 0) {
                 console.log("Team Total By individuals");
 		console.log(rows);
-				var results = {};
-                results.teamName = rows[0].team_name;
-                results.data = rows;
-                return cb.success(results);         
+                return cb.success(rows);         
             } else {
                 //This team has no points
                 console.log("This team has no points!");
-		var results = {};
-                results.teamName = rows[0].team_name;
-                results.data = [];
-                return cb.success(results);         
+		var emptyArray = [];
+                return cb.success(emptyArray);         
             }
         },
         function error(error) {
@@ -144,16 +139,11 @@ var getTotalPointsForAllTeams = function(req, cb) {
                 console.log("Team Total");
                 console.log(rows[0]);
                 console.log(rows[0].team_name);
-                var results = {};
-                results.teamName = rows[0].team_name;
-                results.data = rows;
-                return cb.success(results);            
+                return cb.success(rows);            
             } else {
                 console.log("This team has no points!");
-                var results = {};
-                results.teamName = rows[0].team_name;
-                results.data = [];
-                return cb.success(results);         
+		var emptyArray = [];
+                return cb.success(emptyArray);         
             }
         },
         function error(error) {
