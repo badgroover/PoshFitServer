@@ -9,6 +9,12 @@
       <% include ../views/partials/header %>
     </header>
 
+    <% if(dashboardMessage) { %>
+      <div class="alert alert-info">
+        <%= dashboardMessage %>
+      </div>
+    <% } %>
+
     <h2>Dashboard</h2>
 
     <% if(userTeamData.length > 0) { %>

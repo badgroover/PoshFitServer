@@ -403,9 +403,30 @@ app.get('/dashboard', requireLogin, function(req, res){
                         _.sortBy(teamData, 'total_points'); 
                     }
 
+                    // var dashboardMessageCallback = {
+                    //     success: function success(message) {
+                    //         res.render('dashboard', {
+                    //             userTeamData: userTeamData,
+                    //             teamData: teamData,
+                    //             dashboardMessage: message
+                    //         });
+                    //     },
+                    //     error: function error(result) {
+                    //         //return error
+                    //         console.log("Error in dashboard getDashboardMessage: ");
+                    //         console.log(result);
+                    //         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+                    //         res.render('error', {
+                    //             error: error
+                    //         });
+                    //     }
+                    // }
+                    // getDashboardMessage();
+
                     res.render('dashboard', {
                         userTeamData: userTeamData,
-                        teamData: teamData
+                        teamData: teamData,
+                        dashboardMessage: ""
                     });
                 },
                 error: function error(result){
