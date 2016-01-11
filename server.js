@@ -111,19 +111,24 @@ var getTotalPointsForTeam = function(req, cb) {
     });
 }
 
-var getTotalPointsForByTeamMembers = function(req, cb) {
+var getTotalPointsForTeamMembers = function(req, cb) {
     var queryString = 'SELECT SUM(points) as total_points,  team_name, email FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id LEFT JOIN userInfo ON activityLog.user_id=userInfo.id WHERE activityLog.team_id = ' + req.session.team_id + " GROUP BY user_id";
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length !== 0) {
                 console.log("Team Total By individuals");
-				console.log(rows);
-                return cb.success(rows);         
+		console.log(rows);
+				var results = {};
+                results.teamName = rows[0].team_name;
+                results.data = rows;
+                return cb.success(results);         
             } else {
                 //This team has no points
                 console.log("This team has no points!");
-		var emptyRowsArray = [];
-                return cb.success(emptyRowsArray);         
+		var results = {};
+                results.teamName = rows[0].team_name;
+                results.data = [];
+                return cb.success(results);         
             }
         },
         function error(error) {
@@ -131,7 +136,7 @@ var getTotalPointsForByTeamMembers = function(req, cb) {
     });
 }
 
-var getTotalPointsForAllTeam = function(req, cb) {
+var getTotalPointsForAllTeams = function(req, cb) {
     var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
     queryHelper.runQuery(queryString, 
         function success(rows) {
