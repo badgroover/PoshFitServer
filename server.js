@@ -120,7 +120,8 @@ var getTotalPointsForByTeamMembers = function(req, cb) {
                 return cb.success(rows);         
             } else {
                 //This team has no points
-				var emptyRowsArray = [];
+                console.log("This team has no points!");
+		var emptyRowsArray = [];
                 return cb.success("0");         
             }
         },
