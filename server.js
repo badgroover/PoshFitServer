@@ -361,6 +361,30 @@ app.post('/login',function(req, res){
     findUser(req.body.username, req.body.password, callback); 
 });
 
+//Enter new password
+app.get('/user/change-password', requireLogin, function(req, res){
+    res.render('resetPassword', {
+        error: ""
+    });
+});
+
+//Update new password
+app.post('/user/change-password', requireLogin, function(req, res){
+    var callback = {
+        success: function success() {
+            console.log("USER NAME IS - " + req.session.username);
+            req.session.password = req.body.password;
+            res.redirect('/dashboard');
+        },
+        error: function error(error) {
+            res.render('resetPassword', {
+                error: error
+            });
+        }
+    }
+    resetPassword(req.session.username, req.body.password, callback); 
+});
+
 //Dashboard page (team homepage and data for other teams)
 app.get('/dashboard', requireLogin, function(req, res){
     var callback = {
