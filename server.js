@@ -367,8 +367,7 @@ app.get('/dashboard', requireLogin, function(req, res){
         success : function success(result) {
             console.log("Team result");
             console.log(result);
-            var userTeamData = result, 
-                userTeamName;
+            var userTeamData = result;
 
             var allTeamPointsCallback = {
                 success: function success(result){
@@ -381,9 +380,8 @@ app.get('/dashboard', requireLogin, function(req, res){
                     }
 
                     res.render('dashboard', {
-                        userTeamName: userTeamName,
-                        teamData: teamData,
-                        userTeamData: userTeamData
+                        userTeamData: userTeamData,
+                        teamData: teamData
                     });
                 },
                 error: function error(result){
@@ -397,7 +395,7 @@ app.get('/dashboard', requireLogin, function(req, res){
                 }
             }
 
-            getTotalPointsForAllTeam(req, allTeamPointsCallback);
+            getTotalPointsForAllTeams(req, allTeamPointsCallback);
         },
         error : function error(err) {
             //return error
@@ -409,7 +407,7 @@ app.get('/dashboard', requireLogin, function(req, res){
             });
         }
         };
-	getTotalPointsForByTeamMembers(req, callback);
+	getTotalPointsForTeamMembers(req, callback);
 });
 
 //About page

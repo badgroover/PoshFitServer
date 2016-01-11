@@ -12,7 +12,7 @@
     <h2>Dashboard</h2>
 
     <% if(userTeamData.length > 0) { %>
-      <h3><%= userTeamName %> Total</h3>
+      <h3>Your Team Total</h3>
       <table class="table table-condensed table-hover table-bordered table-responsive" id="userTeamStats">
         <tr>
           <th>Team Member</th>
@@ -26,7 +26,7 @@
         <% }) %>
       </table>
     <% } else { %>
-      <h4><%= userTeamName %> needs to get started accumulating points!</h4>
+      <h4>Your team needs to get started accumulating points!</h4>
     <% } %>
 
     <h3>All Teams Total</h3>
