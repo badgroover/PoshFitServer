@@ -35,6 +35,8 @@ app.use(express.static('public'));
 
 app.use(function(req, res, next) {
   res.locals.session = req.session;
+  res.locals.startDate = envConfig.startDate;
+  res.locals.dayBeforeStartDate = envConfig.dayBeforeStartDate;
   next();
 });
 
