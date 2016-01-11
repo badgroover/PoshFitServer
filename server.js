@@ -552,8 +552,8 @@ app.post('/:username/activities', requireLogin, function(req, res){
       if(activityData.length > 0) {
         setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
           function success(result) {
-            console.log("FINISHED!!!");
-            res.end("yes");
+            console.log("FINISHED UPDATING ACTIVITIES!!!");
+            res.redirect('/dashboard');
           },
           function error(err) {
             console.log("Error in set user activities setUserActivityFor:");
