@@ -101,8 +101,9 @@ var getTotalPointsForTeam = function(req, cb) {
                 console.log(rows[0]["SUM(points)"]);
                 return cb.success("" + rows[0]["SUM(points)"]);         
             } else {
-                //This team has no points
-                return cb.success("0");         
+                console.log("This team has no points!");
+		var emptyRowsArray = [];
+                return cb.success(emptyRowsArray);         
             }
         },
         function error(error) {
@@ -122,7 +123,7 @@ var getTotalPointsForByTeamMembers = function(req, cb) {
                 //This team has no points
                 console.log("This team has no points!");
 		var emptyRowsArray = [];
-                return cb.success("0");         
+                return cb.success(emptyRowsArray);         
             }
         },
         function error(error) {
@@ -138,10 +139,16 @@ var getTotalPointsForAllTeam = function(req, cb) {
                 console.log("Team Total");
                 console.log(rows[0]);
                 console.log(rows[0].team_name);
-                return cb.success(rows);            
+                var results = {};
+                results.teamName = rows[0].team_name;
+                results.data = rows;
+                return cb.success(results);            
             } else {
-                //This team has no points..return error?
-                return cb.success("0");         
+                console.log("This team has no points!");
+                var results = {};
+                results.teamName = rows[0].team_name;
+                results.data = [];
+                return cb.success(results);         
             }
         },
         function error(error) {
