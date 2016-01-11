@@ -16,7 +16,7 @@
 	<h2>Update Activities - <%= displayDate %></h2>
 
 	<form id="activity-form" class="form-horizontal" action="/<%= session.username %>/activities" method="post">
-		<table class="table table-condensed table-hover table-bordered">
+		<table class="table table-condensed table-hover table-bordered table-responsive">
 		<% Object.keys(activitiesByCategory).forEach(function(category){ %>
 			<tr>
 				<th><%= category %></th>

@@ -329,34 +329,43 @@ app.post('/login',function(req, res){
 
 //Dashboard page (team homepage and data for other teams)
 app.get('/dashboard', requireLogin, function(req, res){
- //    var callback = {
- //        success : function success(result) {
- //            console.log("Team result");
- //            console.log(result);
- //            userTeamData = result;
-            
- //            getTotalPointsForAllTeam(req, 
- //             function success(result){
- //                 teamData = result;
- //                 console.log("All Teams result");
- //                 console.log(teamData);
- //                 res.render('dashboard', {
- //                    teamData: teamData,
- //                    userTeamData: userTeamData
- //                 });
- //              }, 
- //             function error(error){
- //                 //return error
- //                 res.end("no");
- //             });
- //        },
- //        error : function error(err) {
- //            // res.send(err);
- //            res.end("no");
- //        }
- //        };
-	// getTotalPointsForByTeamMembers(req, callback);
-    res.end("yes");
+    var callback = {
+        success : function success(result) {
+            console.log("Team result");
+            console.log(result);
+            var userTeamData = result, 
+                userTeamName;
+
+            var allTeamPointsCallback = {
+                success: function success(result){
+                    teamData = result;
+                    console.log("All Teams result");
+                    console.log(teamData);
+
+                    if(teamData) {
+                        _.sortBy(teamData, 'total_points'); 
+                    }
+
+                    res.render('dashboard', {
+                        userTeamName: userTeamName,
+                        teamData: teamData,
+                        userTeamData: userTeamData
+                    });
+                },
+                error: function error(result){
+                    //return error
+                    res.end("no");
+                }
+            }
+
+            getTotalPointsForAllTeam(req, allTeamPointsCallback);
+        },
+        error : function error(err) {
+            // res.send(err);
+            res.end("no");
+        }
+        };
+	getTotalPointsForByTeamMembers(req, callback);
 });
 
 //About page

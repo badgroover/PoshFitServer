@@ -9,7 +9,7 @@
       <% include ../views/partials/header %>
     </header>
 	<h2>List of Activities and Points</h2>
-	<table class="table table-condensed table-hover table-bordered">
+	<table class="table table-condensed table-hover table-bordered table-responsive">
 		<% Object.keys(activitiesByCategory).forEach(function(category){ %>
 			<tr>
 				<th><%= category %></th>

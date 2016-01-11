@@ -78,9 +78,19 @@ $(document).ready(function(){
       		submissionDate = yesterdaysDate
       	}
 
-
-		//TODO: Preethi 
 		// check if all selected values have duration and points calculated
+		$("table #activities #user-selected:checked").each(function(){
+			var row = $(this).parent().parent(),
+				activityTotalPoints = $(row).find("#total-points").val(),
+				activity = $(row).find("#activity").text();
+			if(activityTotalPoints && activityTotalPoints > 0){
+
+			} else {
+				alert("Please enter a duration for " + activity);
+				eventObj.preventDefault();
+				return false;
+			}
+		});
 
 		var formValue = {};
 		$.each($(form).serializeArray(), function(i, field) {

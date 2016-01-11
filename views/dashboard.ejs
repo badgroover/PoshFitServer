@@ -10,11 +10,42 @@
     </header>
   <h2>Dashboard</h2>
 
-  <table class="table table-condensed table-hover table-bordered">
-  </table>
+  <% if(userTeamData.length > 0) { %>
+    <h3><%= userTeamName %> Total</h3>
+    <table class="table table-condensed table-hover table-bordered table-responsive" id="userTeamStats">
+      <tr>
+        <th>Team Member</th>
+        <th>Total Points</th>
+      </tr>
+      <% userTeamData.forEach(function(data){ %>
+        <tr>
+          <td><%= data.email %></td>
+          <td><%= data.total_points %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } else { %>
+    <h4><%= userTeamName %> needs to get started accumulating points!</h4>
+  <% } %>
 
-  <table class="table table-condensed table-hover table-bordered">
-  </table>
+  <h3>All Teams Total</h3>
+
+  <% if(teamData.length > 0) { %>
+    <table class="table table-condensed table-hover table-bordered table-responsive" id="allTeamStats">
+      <tr>
+        <th>Team Name</th>
+        <th>Total Points</th>
+      </tr>
+      <% teamData.forEach(function(data){ %>
+        <tr>
+          <td><%= data.team_name %></td>
+          <td><%= data.total_points %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } else { %>
+    <h4>Teams haven't started entering points yet :/ </h4>
+  <% } %>
 
   <footer>
       <% include ../views/partials/footer %>
