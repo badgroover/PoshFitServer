@@ -174,59 +174,82 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
     });
 }
 var updateActivityLog = function(sql, rowData, successCb, errorCb) {
-    queryHelper.runQuery(sql,
-        function success (rows) {
-            var sql;
+    if(rowData.deleted === true) {
+		var sql = [ 'delete from activityLog where ',
+					' user_id = ' + rowData.userId ,
+					' and activity_id = ' + rowData.activityId,
+					' and date = ' + queryHelper.esc(rowData.date)
+					].join(' ');
+		//Delete the row..
+		console.log("Delete Row");
+		console.log(sql);	
+		queryHelper.runQuery(sql, 
+			function success (rows) {
+				console.log("Delete OK");
+				console.log(rows);	
+                rowData.isOK = true;
+                successCb();			
+			},
+			function error (error) {
+                rowData.isOK = false;
+                errorCb();			
+			}
+		);			
+	} else {
+		queryHelper.runQuery(sql,
+	        function success (rows) {
+	            var sql;
             
-            //Duration is undefined for Wellbeing and Consumption activities
-            //Hack to give it a ruration. Maybe client sents 60?
-            console.log(rowData);
-			if (typeof rowData.duration === 'undefined') {
-                rowData.duration = 0;
-            }
+	            //Duration is undefined for Wellbeing and Consumption activities
+	            //Hack to give it a ruration. Maybe client sents 60?
+	            console.log(rowData);
+				if (typeof rowData.duration === 'undefined') {
+	                rowData.duration = 0;
+	            }
                 
-            if(rowData.deleted === true) {
-                //clear out this row
-            } else {
-                if(rows.length == 1) {
-                    //found a prev entry...update..
-                    sql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
-                                 ' ,duration = ' + rowData.duration,
-                                 ' ,points = ' + rowData.points,
-                                 ' where user_id = ' + rowData.userId ,
-                                 ' and activity_id = ' + rowData.activityId,
-                                 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
-                    console.log("UPDATE for :");
-                    console.log(rowData);
-                } else if(rows.length == 0) {
-                    //new row...insert..
-                    sql = [
-                            'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
-                            rowData.userId + ',',
-                            rowData.teamId + ',',
-                            rowData.activityId + ',',
-                            rowData.duration + ',',
-                            rowData.points + ',',
-                            queryHelper.esc(rowData.date) + ')'].join(' ');
-                    console.log("INSERT SQL :");
-                    console.log(sql);
-                }
-            }
-            queryHelper.runQuery(sql, 
-                function success() {
-                    rowData.isOK = true;
-                    successCb();
-                },
-                function error() {
-                    rowData.isOK = false;
-                    errorCb();
-                })
+	            if(rowData.deleted === true) {
+	                //clear out this row
+	            } else {
+	                if(rows.length == 1) {
+	                    //found a prev entry...update..
+	                    sql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
+	                                 ' ,duration = ' + rowData.duration,
+	                                 ' ,points = ' + rowData.points,
+	                                 ' where user_id = ' + rowData.userId ,
+	                                 ' and activity_id = ' + rowData.activityId,
+	                                 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
+	                    console.log("UPDATE for :");
+	                    console.log(rowData);
+	                } else if(rows.length == 0) {
+	                    //new row...insert..
+	                    sql = [
+	                            'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
+	                            rowData.userId + ',',
+	                            rowData.teamId + ',',
+	                            rowData.activityId + ',',
+	                            rowData.duration + ',',
+	                            rowData.points + ',',
+	                            queryHelper.esc(rowData.date) + ')'].join(' ');
+	                    console.log("INSERT SQL :");
+	                    console.log(sql);
+	                }
+	            }
+	            queryHelper.runQuery(sql, 
+	                function success() {
+	                    rowData.isOK = true;
+	                    successCb();
+	                },
+	                function error() {
+	                    rowData.isOK = false;
+	                    errorCb();
+	                })
             
-        },
-        function error(error) {
-            errorCb();
-        }
-    );
+	        },
+	        function error(error) {
+	            errorCb();
+	        }
+	    );
+	}
 }
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
     var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
