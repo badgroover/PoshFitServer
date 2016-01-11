@@ -26,9 +26,9 @@
 		console.log(module.exports.pool);
 		module.exports.pool.getConnection(function(err,connection){
         	if (err) {
-				console.log("Query Error 1");
-            	connection.release();
-            	onError(err);
+		    console.log("getConnection Error:");
+		    console.log(err);
+            	    onError(err);
         	} else {
             	connection.query(queryString,function(err,rows){
                 connection.release();
