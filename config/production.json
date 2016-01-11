@@ -5,8 +5,8 @@
 		"password": "",
 		"db": "PoshfitDb"
 	},
-	"startDate": "2016-1-11",
-	"dayBeforeStartDate": "2016-1-10",
+	"startDate": "2016-1-12",
+	"dayBeforeStartDate": "2016-1-11",
 	"port" : 8080,
 	"host" : "http://52.33.186.147"
 }
