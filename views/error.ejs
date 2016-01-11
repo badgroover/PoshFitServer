@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include ../views/partials/head %>
+    <title>Poshfit Challange Error</title>
+  </head>
+  <body class="container">
+
+    <header>
+      <% include ../views/partials/header %>
+    </header>
+
+    <% if(error) { %>
+      <div class="alert alert-warning">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <footer>
+      <% include ../views/partials/footer %>
+    </footer>
+
+  </body>
+</html>

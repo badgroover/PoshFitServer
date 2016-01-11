@@ -292,7 +292,13 @@ app.get('/activities', function (req, res) {
       });
     },
     error : function error(err) {
-      res.send(err);
+        //return error
+        console.log("Error in activities getAllActivitiesInfo: ");
+        console.log(err);
+        error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+        res.render('error', {
+            error: error
+        });
     }
   };
   getAllActivitiesInfo(callback);
@@ -323,7 +329,7 @@ app.post('/login',function(req, res){
         error: function error(error) {
             res.render('login', {
                 error: error
-            })
+            });
         }
     }
     findUser(req.body.username, req.body.password, callback); 
@@ -356,15 +362,25 @@ app.get('/dashboard', requireLogin, function(req, res){
                 },
                 error: function error(result){
                     //return error
-                    res.end("no");
+                    console.log("Error in dashboard getTotalPointsForAllTeam: ");
+                    console.log(result);
+                    error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+                    res.render('error', {
+                        error: error
+                    });
                 }
             }
 
             getTotalPointsForAllTeam(req, allTeamPointsCallback);
         },
         error : function error(err) {
-            // res.send(err);
-            res.end("no");
+            //return error
+            console.log("Error in dashboard getTotalPointsForByTeamMembers: ");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+            res.render('error', {
+                error: error
+            });
         }
         };
 	getTotalPointsForByTeamMembers(req, callback);
@@ -417,19 +433,31 @@ app.get('/:username/activities', requireLogin, function(req, res){
             });
         },
         function error(err) {
-          //return error
-          res.end("no");
+            //return error
+            console.log("Error in user activities getUserActivityFor:");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+            res.render('error', {
+                error: error
+            });
         });
       },
       error : function error(err) {
         //return error
-        res.end("no");
+        console.log("Error in user activities getAllActivitiesInfo:");
+        console.log(err);
+        error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+        res.render('error', {
+            error: error
+        });
       }
     };
     getAllActivitiesInfo(callback);
   } else {
-    // TODO: Display this error message to the user 
-    res.send('Username doesn\'t match the user logged in');
+    error = 'Username doesn\'t match the user logged in';
+    res.render('error', {
+        error: error
+    });
   }
 });
 
@@ -505,8 +533,12 @@ app.post('/:username/activities', requireLogin, function(req, res){
             res.end("yes");
           },
           function error(err) {
-            // TODO: Preethi handle error
-            res.end("no");
+            console.log("Error in set user activities setUserActivityFor:");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to update data. Please try again later';
+            res.render('error', {
+                error: error
+            });
           });
       } else {
         console.log("DID NOT UPDATE ANYTHING!!!");
@@ -515,8 +547,11 @@ app.post('/:username/activities', requireLogin, function(req, res){
 
 
     } else {
-      // TODO: Display this error message to the user 
-      res.send('Username doesn\'t match the user logged in');
+        //return error
+        error = 'Username doesn\'t match the user logged in';
+        res.render('error', {
+            error: error
+        });
     }
 
 });
