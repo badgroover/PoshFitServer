@@ -4,8 +4,10 @@
 	var argv = require('minimist')(process.argv.slice(2));
 	console.log(argv);
 	if(argv.e == "dev") {
+		console.log("Init Dev env.");
 		envConfig = require('./config/development.json');  
 	} else {
+		console.log("Init Prod env.");
 		envConfig = require('./config/production.json');  
 	}
 	
@@ -21,6 +23,7 @@
 	module.exports.runQuery = function(queryString, onSuccess, onError) {
 		console.log("Query :")
 		console.log(queryString);
+		console.log(module.exports.pool);
 		module.exports.pool.getConnection(function(err,connection){
         	if (err) {
 				console.log("Query Error 1");
