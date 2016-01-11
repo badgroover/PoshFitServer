@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.45, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.10, for osx10.10 (x86_64)
 --
 -- Host: localhost    Database: PoshfitDb
 -- ------------------------------------------------------
--- Server version	5.5.45
+-- Server version	5.5.47
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -15,7 +15,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
 --
 -- Table structure for table `activityLog`
 --
@@ -24,9 +23,9 @@ DROP TABLE IF EXISTS `activityLog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `activityLog` (
-  `activity_id` int(11) NOT NULL ,
+  `activity_id` int(11) NOT NULL,
   `duration` int(11) NOT NULL,
-  `date` varchar(40) not NULL,
+  `date` varchar(40) NOT NULL,
   `team_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `points` float(10,2) DEFAULT NULL,
@@ -45,6 +44,7 @@ CREATE TABLE `activityLog` (
 
 LOCK TABLES `activityLog` WRITE;
 /*!40000 ALTER TABLE `activityLog` DISABLE KEYS */;
+INSERT INTO `activityLog` VALUES (34,24,'2016-1-3',1,1,0.80),(27,60,'2016-1-3',1,1,4.00),(34,10,'2016-1-2',1,1,0.33),(27,10,'2016-1-2',1,1,0.67),(34,24,'2016-1-3',1,2,1.00),(27,60,'2016-1-3',1,2,1.00),(34,10,'2016-1-2',1,2,1.00),(27,10,'2016-1-2',1,2,1.00),(1,0,'2016-1-10',1,1,1.00),(5,0,'2016-1-10',1,1,5.00),(10,10,'2016-1-10',1,1,0.50);
 /*!40000 ALTER TABLE `activityLog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,13 +56,13 @@ DROP TABLE IF EXISTS `activityMetadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `activityMetadata` (
-  `id` int(11) NOT NULL  PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `Category` varchar(40) NOT NULL,
   `Activity` varchar(40) NOT NULL,
   `Points` int(11) NOT NULL,
-  `Duration` int(11) NOT NULL
-
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=latin1;
+  `Duration` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,9 +83,10 @@ DROP TABLE IF EXISTS `teamMetadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `teamMetadata` (
-  `id` int(11) NOT NULL  AUTO_INCREMENT PRIMARY KEY,
-  `team_name` varchar(40) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `team_name` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,6 +95,7 @@ CREATE TABLE `teamMetadata` (
 
 LOCK TABLES `teamMetadata` WRITE;
 /*!40000 ALTER TABLE `teamMetadata` DISABLE KEYS */;
+INSERT INTO `teamMetadata` VALUES (1,'test_team1'),(2,'test_team2'),(3,'Wolfpack'),(4,'We ARE the Champions'),(5,'2 Fast 2 Furious'),(6,'Data Team'),(7,'Ermahgerd Werk'),(8,'Commerce Team'),(9,'The Odd Father'),(10,'KALE\'in IT'),(11,'Victorious Secret'),(12,'Life\'s a beach!'),(13,'Zeng\'s Team'),(14,'Triple Threat');
 /*!40000 ALTER TABLE `teamMetadata` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,44 +107,23 @@ DROP TABLE IF EXISTS `userInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `userInfo` (
-  `id` int(11) NOT NULL  AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(40) NOT NULL,
   `password` varchar(40) NOT NULL,
   `team_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `team_id` (`team_id`),
   CONSTRAINT `userInfo_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teamMetadata` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-insert into teamMetaData (team_name) values ('test_team1');
-insert into userInfo (email, password, team_id) values ('test1@poshmark.com', 'password', 1);
-insert into userInfo (email, password, team_id) values ('test12@poshmark.com', 'password', 1);
-
-insert into teamMetaData (team_name) values ('test_team2');
-insert into userInfo (email, password, team_id) values ('test2@poshmark.com', 'password', 2);
-insert into userInfo (email, password, team_id) values ('test22@poshmark.com', 'password', 2);
-
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 24, '2016-1-3', 1, 1, .80 );
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 60, '2016-1-3', 1, 1, 4.00);
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 10, '2016-1-2', 1, 1, .33);
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 10, '2016-1-2', 1, 1, .67);
-
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 24, '2016-1-3', 1, 2, 1 );
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 60, '2016-1-3', 1, 2, 1);
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (34, 10, '2016-1-2', 1, 2, 1);
-insert into activityLog( activity_id, duration, date, team_id, user_id, points) values (27, 10, '2016-1-2', 1, 2, 1);
-
 
 --
 -- Dumping data for table `userInfo`
 --
 
 LOCK TABLES `userInfo` WRITE;
-
-
-
-
 /*!40000 ALTER TABLE `userInfo` DISABLE KEYS */;
+INSERT INTO `userInfo` VALUES (1,'test1@poshmark.com','password',1),(2,'test12@poshmark.com','password',1),(3,'test2@poshmark.com','password',2),(4,'test22@poshmark.com','password',2);
 /*!40000 ALTER TABLE `userInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -155,4 +136,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-12-24 19:41:47
+-- Dump completed on 2016-01-11  0:15:37
