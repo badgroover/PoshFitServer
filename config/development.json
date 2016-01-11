@@ -1,6 +1,6 @@
 {
 	"sql" : {
-		"host": "52.53.229.110",
+		"host": "127.0.0.1",
 		"user": "ec2-user",
 		"password": "",
 		"db": "PoshfitDb"
