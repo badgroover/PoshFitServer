@@ -35,6 +35,8 @@ app.use(express.static('public'));
 
 app.use(function(req, res, next) {
   res.locals.session = req.session;
+  res.locals.startDate = envConfig.startDate;
+  res.locals.dayBeforeStartDate = envConfig.dayBeforeStartDate;
   next();
 });
 
@@ -115,7 +117,7 @@ var getTotalPointsForByTeamMembers = function(req, cb) {
             if(rows.length !== 0) {
                 console.log("Team Total By individuals");
 				console.log(rows);
-                return cb.success("yes");         
+                return cb.success(rows);         
             } else {
                 //This team has no points
 				var emptyRowsArray = [];
@@ -135,7 +137,7 @@ var getTotalPointsForAllTeam = function(req, cb) {
                 console.log("Team Total");
                 console.log(rows[0]);
                 console.log(rows[0].team_name);
-                return cb.success("OK");            
+                return cb.success(rows);            
             } else {
                 //This team has no points..return error?
                 return cb.success("0");         
@@ -313,7 +315,13 @@ app.get('/activities', function (req, res) {
       });
     },
     error : function error(err) {
-      res.send(err);
+        //return error
+        console.log("Error in activities getAllActivitiesInfo: ");
+        console.log(err);
+        error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+        res.render('error', {
+            error: error
+        });
     }
   };
   getAllActivitiesInfo(callback);
@@ -337,49 +345,68 @@ app.post('/login',function(req, res){
             req.session.username = re.exec(username)[1];
             console.log("USER NAME IS - " + req.session.username)
             req.session.user_id = user_id;
-                req.session.team_id = team_id;
+            req.session.team_id = team_id;
             req.session.password = req.body.password;
             res.redirect('/dashboard');
         },
         error: function error(error) {
             res.render('login', {
                 error: error
-            })
+            });
         }
     }
     findUser(req.body.username, req.body.password, callback); 
 });
 
-// TODO: Preethi
 //Dashboard page (team homepage and data for other teams)
 app.get('/dashboard', requireLogin, function(req, res){
     var callback = {
         success : function success(result) {
-            // res.end(result);
-            // userTeamData = result;
-            // 
-            //  getAllTeamStats(
-            //  function success(result){
-            //                  teamData = result;
-            //                  res.render('dashboard', {
-            //                     teamData: teamData,
-            //                     userTeamData: userTeamData
-            //                  });
-            //              }, 
-            //              function error(error){
-            //                  //return error
-            //                  res.end("no");
-            //              }
-            // );
+            console.log("Team result");
+            console.log(result);
+            var userTeamData = result, 
+                userTeamName;
+
+            var allTeamPointsCallback = {
+                success: function success(result){
+                    teamData = result;
+                    console.log("All Teams result");
+                    console.log(teamData);
+
+                    if(teamData) {
+                        _.sortBy(teamData, 'total_points'); 
+                    }
+
+                    res.render('dashboard', {
+                        userTeamName: userTeamName,
+                        teamData: teamData,
+                        userTeamData: userTeamData
+                    });
+                },
+                error: function error(result){
+                    //return error
+                    console.log("Error in dashboard getTotalPointsForAllTeam: ");
+                    console.log(result);
+                    error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+                    res.render('error', {
+                        error: error
+                    });
+                }
+            }
+
+            getTotalPointsForAllTeam(req, allTeamPointsCallback);
         },
         error : function error(err) {
-//            res.send(err);
-            }
+            //return error
+            console.log("Error in dashboard getTotalPointsForByTeamMembers: ");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+            res.render('error', {
+                error: error
+            });
+        }
         };
-        //getTeamStats(req.session.user_id, req.session.team_id, callback);
-		getTotalPointsForByTeamMembers(req, callback);
-        //getTotalPointsForTeam(req, callback);
-        //getTotalPointsForAllTeam(req, callback);
+	getTotalPointsForByTeamMembers(req, callback);
 });
 
 //About page
@@ -429,19 +456,31 @@ app.get('/:username/activities', requireLogin, function(req, res){
             });
         },
         function error(err) {
-          //return error
-          res.end("no");
+            //return error
+            console.log("Error in user activities getUserActivityFor:");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+            res.render('error', {
+                error: error
+            });
         });
       },
       error : function error(err) {
         //return error
-        res.end("no");
+        console.log("Error in user activities getAllActivitiesInfo:");
+        console.log(err);
+        error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+        res.render('error', {
+            error: error
+        });
       }
     };
     getAllActivitiesInfo(callback);
   } else {
-    // TODO: Display this error message to the user 
-    res.send('Username doesn\'t match the user logged in');
+    error = 'Username doesn\'t match the user logged in';
+    res.render('error', {
+        error: error
+    });
   }
 });
 
@@ -476,7 +515,7 @@ app.post('/:username/activities', requireLogin, function(req, res){
      if(req.body.activityIdDeleted){
         console.log("In deleted");
         if(req.body.activityIdDeleted instanceof Array) {
-            activityIdsToBeUpdated = req.body.activitySelected;
+            activityIdsDeleted = req.body.activityIdDeleted;
         } else {
             activityIdsDeleted = [req.body.activityIdDeleted];
         }
@@ -517,8 +556,12 @@ app.post('/:username/activities', requireLogin, function(req, res){
             res.end("yes");
           },
           function error(err) {
-            // TODO: Preethi handle error
-            res.end("no");
+            console.log("Error in set user activities setUserActivityFor:");
+            console.log(err);
+            error = 'Sorry something went wrong when trying to update data. Please try again later';
+            res.render('error', {
+                error: error
+            });
           });
       } else {
         console.log("DID NOT UPDATE ANYTHING!!!");
@@ -527,8 +570,11 @@ app.post('/:username/activities', requireLogin, function(req, res){
 
 
     } else {
-      // TODO: Display this error message to the user 
-      res.send('Username doesn\'t match the user logged in');
+        //return error
+        error = 'Username doesn\'t match the user logged in';
+        res.render('error', {
+            error: error
+        });
     }
 
 });

@@ -71,16 +71,26 @@ $(document).ready(function(){
       yesterday.setDate(yesterday.getDate() - 1);
       yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
 
-      if(activityDate === currentDate || activityDate === yesterdaysDate) {
+      if((activityDate === currentDate || activityDate === yesterdaysDate) && activityDate !== dayBeforeStartDate) {
       	if(activityDate == currentDate){
       		submissionDate = currentDate;
       	} else {
       		submissionDate = yesterdaysDate
       	}
 
-
-		//TODO: Preethi 
 		// check if all selected values have duration and points calculated
+		$("table #activities #user-selected:checked").each(function(){
+			var row = $(this).parent().parent(),
+				activityTotalPoints = $(row).find("#total-points").val(),
+				activity = $(row).find("#activity").text();
+			if(activityTotalPoints && activityTotalPoints > 0){
+
+			} else {
+				alert("Please enter a duration for " + activity);
+				eventObj.preventDefault();
+				return false;
+			}
+		});
 
 		var formValue = {};
 		$.each($(form).serializeArray(), function(i, field) {
@@ -104,7 +114,11 @@ $(document).ready(function(){
       	$(this).append('<input type="hidden" name="activityDate" value="'+ submissionDate +'" /> ');	
       	return true;
       } else {
-      	alert("Too late to submit data for " + activityDate + " !");
+      	if(yesterdaysDate === dayBeforeStartDate){
+      		alert("The challenge started today. Don't try to enter data for yesterday!");
+      	} else {
+      		alert("Too late to submit data for " + activityDate + " !");
+      	}
       	window.location.replace("/dashboard");
       	return false;
       }
