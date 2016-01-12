@@ -102,7 +102,7 @@ var getDashboardMessage = function(cb) {
 	var sql = "SELECT * from dashboardMessage";
 	queryHelper.runQuery(sql, 
         function success(rows) {
-            console.log("Got dashboard message");  
+            logger.info("Got dashboard message");  
             if(rows.length == 1) {
 				return cb.success(rows[0].message);
 			} else {
@@ -457,8 +457,8 @@ app.get('/dashboard', requireLogin, function(req, res){
                         },
                         error: function error(result) {
                             //return error
-                            console.log("Error in dashboard getDashboardMessage: ");
-                            console.log(result);
+                            logger.error("Error in dashboard getDashboardMessage: ");
+                            logger.error(result);
                             error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
                             res.render('error', {
                                 error: error
