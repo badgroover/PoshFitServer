@@ -76,6 +76,19 @@ INSERT INTO `activityMetadata` VALUES (1,'Well-Being','Floss Teeth',1,0),(2,'Wel
 UNLOCK TABLES;
 
 --
+-- Table structure for table `activityMetadata`
+--
+
+DROP TABLE IF EXISTS `dashboardMessage`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dashboardMessage` (
+  `message` TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
 -- Table structure for table `teamMetadata`
 --
 
@@ -111,6 +124,7 @@ CREATE TABLE `userInfo` (
   `email` varchar(40) NOT NULL,
   `password` varchar(40) NOT NULL,
   `team_id` int(11) DEFAULT NULL,
+  `resetFlag` TINYINT(1) DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `team_id` (`team_id`),
   CONSTRAINT `userInfo_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `teamMetadata` (`id`)
@@ -123,20 +137,38 @@ CREATE TABLE `userInfo` (
 
 LOCK TABLES `userInfo` WRITE;
 /*!40000 ALTER TABLE `userInfo` DISABLE KEYS */;
-INSERT INTO `userInfo` VALUES (1,'test1@poshmark.com','password',1),(2,'test12@poshmark.com','password',1),
-(3,'test2@poshmark.com','password',2),(4,'test22@poshmark.com','password',2),
-(5, 'amandap@poshmark.com', 'password',3 ), (6, 'freesia@poshmark.com', 'password',3 ), (7, 'lorraine@poshmark.com', 'password',3 ), (8, 'natasha@poshmark.com', 'password',3 ) , (9, 'leah@poshmark.com', 'password',3 ),
-(10, 'angela@poshmark.com', 'password',4), (11, 'marisa@poshmark.com', 'password',4), (12, 'courtney@poshmark.com', 'password',4), (13, 'wincy@poshmark.com', 'password',4) , (14, 'rebekah@poshmark.com', 'password',4),
-(15, 'karen@poshmark.com', 'password',5), (16, 'tasha@poshmark.com', 'password',5), (17, 'marium@poshmark.com', 'password',5), (18, 'barbara@poshmark.com', 'password',5) , (19, 'eunice@poshmark.com', 'password',5),
-(20, 'barkha@poshmark.com', 'password',6), (21, 'max@poshmark.com', 'password',6), (22, 'lian@poshmark.com', 'password',6), (23, 'shirin@poshmark.com', 'password',6) , (24, 'gaurav@poshmark.com', 'password',6) ,
-(25, 'janet@poshmark.com', 'password',7), (26, 'tresha@poshmark.com', 'password',7), (27, 'melanie@poshmark.com', 'password',7), (28, 'sarah@poshmark.com', 'password',7) ,
-(29, 'andrego@poshmark.com', 'password',8), (30, 'kalpak@poshmark.com', 'password',8), (31, 'thejaswi@poshmark.com', 'password',8), (32, 'priya@poshmark.com', 'password',8) , (33, 'ketan@poshmark.com', 'password',8) ,
-(34, 'kamal@poshmark.com', 'password',9), (35, 'divya@poshmark.com', 'password',9), (36, 'mukesh@poshmark.com', 'password',9), (37, 'padma@poshmark.com', 'password',9) ,
-(38, 'lauren@poshmark.com', 'password',10), (39, 'amanda@poshmark.com', 'password',10), (40, 'shazia@poshmark.com', 'password',10), (41, 'joanna@poshmark.com', 'password',10) , (42, 'adiel@poshmark.com', 'password',10) ,
-(43, 'mithin@poshmark.com', 'password',11), (44, 'venkatesh@poshmark.com', 'password',11), (45, 'shrikanth@poshmark.com', 'password',11), (46, 'bhushan@poshmark.com', 'password',11) , (47, 'abhay@poshmark.com', 'password',11) ,
-(48, 'nikhil@poshmark.com', 'password',12), (49, 'anoop@poshmark.com', 'password',12), (50, 'chaule@poshmark.com', 'password',12), (51, 'preethi@poshmark.com', 'password',12) , (52, 'chetan@poshmark.com', 'password',12) ,
-(53, 'zeng@poshmark.com', 'password',13), (54, 'jenny@poshmark.com', 'password',13), (55, 'sathya@poshmark.com', 'password',13), (56, 'yvonne@poshmark.com', 'password',13) ,
-(57, 'megans@poshmark.com', 'password',14), (58, 'melinda@poshmark.com', 'password',14), (59, 'mai@poshmark.com', 'password',14);
+INSERT INTO `userInfo` VALUES (1,'test1@poshmark.com','password',1, 1),(2,'test12@poshmark.com','password',1, 1),
+
+(3,'test2@poshmark.com','password',2,1),(4,'test22@poshmark.com','password',2,1),
+
+(5, 'amandap@poshmark.com', 'password',3 ,1), (6, 'freesia@poshmark.com', 'password',3,1 ), (7, 'lorraine@poshmark.com', 'password',3,1 ), 
+(8, 'natasha@poshmark.com', 'password',3 ,1) , (9, 'leah@poshmark.com', 'password',3 ,1),
+
+(10, 'angela@poshmark.com', 'password',4,1), (11, 'marisa@poshmark.com', 'password',4,1), (12, 'courtney@poshmark.com', 'password',4,1), (13, 'wincy@poshmark.com', 'password',4,1) , (14, 'rebekah@poshmark.com', 'password',4,1),
+
+(15, 'karen@poshmark.com', 'password',5,1), (16, 'tasha@poshmark.com', 'password',5,1), (17, 'marium@poshmark.com', 'password',5,1), (18, 'barbara@poshmark.com', 'password',5,1) , (19, 'eunice@poshmark.com', 'password',5,1),
+
+(20, 'barkha@poshmark.com', 'password',6,1), (21, 'max@poshmark.com', 'password',6,1), (22, 'lian@poshmark.com', 'password',6,1), (23, 'shirin@poshmark.com', 'password',6,1) , (24, 'gaurav@poshmark.com', 'password',6,1) ,
+
+(25, 'janet@poshmark.com', 'password',7,1), (26, 'tresha@poshmark.com', 'password',7,1), (27, 'melanie@poshmark.com', 'password',7,1), (28, 'sarah@poshmark.com', 'password',7,1) ,
+
+(29, 'andrego@poshmark.com', 'password',8,1), (30, 'kalpak@poshmark.com', 'password',8,1), (31, 'thejaswi@poshmark.com', 'password',8,1), (32, 'priya@poshmark.com', 'password',8,1) , (33, 'ketan@poshmark.com', 'password',8,1) ,
+
+(34, 'kamal@poshmark.com', 'password',9,1), (35, 'divya@poshmark.com', 'password',9,1), (36, 'mukesh@poshmark.com', 'password',9,1), (37, 'padma@poshmark.com', 'password',9,1) ,
+
+(38, 'lauren@poshmark.com', 'password',10,1), (39, 'amanda@poshmark.com', 'password',10,1), (40, 'shazia@poshmark.com', 'password',10, 1), 
+(41, 'joanna@poshmark.com', 'password',10,1) , (42, 'adiel@poshmark.com', 'password',10,1) ,
+
+(43, 'mithin@poshmark.com', 'password',11,1), (44, 'venkatesh@poshmark.com', 'password',11,1), (45, 'shrikanth@poshmark.com', 'password',11,1),
+(46, 'bhushan@poshmark.com', 'password',11,1) , (47, 'abhay@poshmark.com', 'password',11,1) ,
+
+(48, 'nikhil@poshmark.com', 'password',12,1), (49, 'anoop@poshmark.com', 'password',12,1), (50, 'chaule@poshmark.com', 'password',12,1), 
+(51, 'preethi@poshmark.com', 'password',12,1) , (52, 'chetan@poshmark.com', 'password',12,1) ,
+
+(53, 'zeng@poshmark.com', 'password',13,1), (54, 'jenny@poshmark.com', 'password',13,1), (55, 'sathya@poshmark.com', 'password',13,1), 
+(56, 'yvonne@poshmark.com', 'password',13,1) ,
+
+(57, 'megans@poshmark.com', 'password',14,1), (58, 'melinda@poshmark.com', 'password',14,1), (59, 'mai@poshmark.com', 'password',14,1);
 
 /*!40000 ALTER TABLE `userInfo` ENABLE KEYS */;
 UNLOCK TABLES;

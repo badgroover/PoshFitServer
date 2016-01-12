@@ -56,16 +56,15 @@ var server = app.listen(envConfig.port, function () {
 
 //Find user
 var findUser = function(username, password, callback) {
-
-  var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
-  
+  	var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
+ 
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length == 1) {
                 if(rows[0].email == username && rows[0].password == password) {
-                callback.success(username, rows[0].id, rows[0].team_id);
+                callback.success(username, rows[0].id, rows[0].team_id, rows[0].resetFlag);
                 } else {
-               callback.error("Username or Password incorrect");
+               		callback.error("Username or Password incorrect");
                 }   
             } else {
                 callback.error("Username or Password incorrect");
@@ -76,6 +75,42 @@ var findUser = function(username, password, callback) {
             callback.error("Something went wrong. Please try logging in later");
     });
 }
+
+//Reset password
+var resetPassword = function(user_id, username, password, callback) {
+	var sql = ['update userInfo set password = ' + queryHelper.esc(password),
+                 ', resetFlag = 0',
+ 				' where id = ' + user_id
+				].join(' ');
+ 
+    queryHelper.runQuery(sql, 
+        function success(rows) {
+			//Password reset succeeded.
+			console.log("Pswd reset OK!")
+			callback.success();
+        },
+        function error(error) {
+            console.log("Pswd reset Fail!")
+            callback.error("Something went wrong will resetting password. Please try later");
+    });
+}
+
+var getDashboardMessage = function(cb) {
+	var sql = "SELECT * from dashboardMessage";
+	queryHelper.runQuery(sql, 
+        function success(rows) {
+            console.log("Got dashboard message");  
+            if(rows.length == 1) {
+				return cb.success(rows[0].message);
+			} else {
+				return cb.success("");
+			}
+        },
+        function error(error) {
+            return cb.error("");
+    });
+}
+
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
@@ -342,15 +377,26 @@ app.get('/login',function(req, res){
 app.post('/login',function(req, res){
   console.log('User name = '+req.body.username+', password is '+req.body.password);
     var callback = {
-        success: function success(username, user_id, team_id) {
-            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        success: function success(username, user_id, team_id, resetPassword) {
+			var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             req.session.email = username
             req.session.username = re.exec(username)[1];
             console.log("USER NAME IS - " + req.session.username)
             req.session.user_id = user_id;
             req.session.team_id = team_id;
-            req.session.password = req.body.password;
-            res.redirect('/dashboard');
+			console.log("Reset password flag");
+			console.log(resetPassword);
+
+            if(resetPassword == 1) {
+				console.log("Reset password");
+			    res.render('resetPassword', {
+			        error: ""
+			    });
+			} else {
+				req.session.password = req.body.password;
+				res.redirect('/dashboard');
+			}
+			
         },
         error: function error(error) {
             res.render('login', {
@@ -382,7 +428,7 @@ app.post('/user/change-password', requireLogin, function(req, res){
             });
         }
     }
-    resetPassword(req.session.username, req.body.password, callback); 
+    resetPassword(req.session.user_id, req.session.username, req.body.password, callback); 
 });
 
 //Dashboard page (team homepage and data for other teams)
@@ -403,31 +449,25 @@ app.get('/dashboard', requireLogin, function(req, res){
                         _.sortBy(teamData, 'total_points'); 
                     }
 
-                    // var dashboardMessageCallback = {
-                    //     success: function success(message) {
-                    //         res.render('dashboard', {
-                    //             userTeamData: userTeamData,
-                    //             teamData: teamData,
-                    //             dashboardMessage: message
-                    //         });
-                    //     },
-                    //     error: function error(result) {
-                    //         //return error
-                    //         console.log("Error in dashboard getDashboardMessage: ");
-                    //         console.log(result);
-                    //         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
-                    //         res.render('error', {
-                    //             error: error
-                    //         });
-                    //     }
-                    // }
-                    // getDashboardMessage();
-
-                    res.render('dashboard', {
-                        userTeamData: userTeamData,
-                        teamData: teamData,
-                        dashboardMessage: ""
-                    });
+                    var dashboardMessageCallback = {
+                        success: function success(message) {
+							res.render('dashboard', {
+                                userTeamData: userTeamData,
+                                teamData: teamData,
+                                dashboardMessage: message
+                            });
+                        },
+                        error: function error(result) {
+                            //return error
+                            console.log("Error in dashboard getDashboardMessage: ");
+                            console.log(result);
+                            error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+                            res.render('error', {
+                                error: error
+                            });
+                        }
+                    }
+                    getDashboardMessage(dashboardMessageCallback);
                 },
                 error: function error(result){
                     //return error
