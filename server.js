@@ -60,7 +60,7 @@ var server = app.listen(envConfig.port, function () {
 //Find user
 var findUser = function(username, password, callback) {
   	var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
- 
+ 	logger.info("In findUser");
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length == 1) {
@@ -81,6 +81,7 @@ var findUser = function(username, password, callback) {
 
 //Reset password
 var resetPassword = function(user_id, username, password, callback) {
+	logger.info("In resetPassword");
 	var sql = ['update userInfo set password = ' + queryHelper.esc(password),
                  ', resetFlag = 0',
  				' where id = ' + user_id
@@ -89,16 +90,17 @@ var resetPassword = function(user_id, username, password, callback) {
     queryHelper.runQuery(sql, 
         function success(rows) {
 			//Password reset succeeded.
-			console.log("Pswd reset OK!")
+			logger.info("Pswd reset OK!")
 			callback.success();
         },
         function error(error) {
-            console.log("Pswd reset Fail!")
-            callback.error("Something went wrong will resetting password. Please try later");
+            logger.info("Pswd reset Fail!")		
+            logger.error("Something went wrong will resetting password. Please try later");
     });
 }
 
 var getDashboardMessage = function(cb) {
+	logger.info("In getDashboardMessage");
 	var sql = "SELECT * from dashboardMessage";
 	queryHelper.runQuery(sql, 
         function success(rows) {
@@ -117,6 +119,7 @@ var getDashboardMessage = function(cb) {
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
+	logger.info("In getAllActivitiesInfo");
     var queryString = 'SELECT * FROM activityMetadata';
     queryHelper.runQuery(queryString, 
         function success(rows) { 
@@ -128,6 +131,7 @@ var getAllActivitiesInfo = function(cb) {
 }
 
 var getTotalPointsForTeam = function(req, cb) {
+	logger.info("In getTotalPointsForTeam");
     var queryString = 'SELECT SUM(points) as total_points FROM activityLog WHERE team_id = ' + req.session.team_id;
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -147,6 +151,7 @@ var getTotalPointsForTeam = function(req, cb) {
 }
 
 var getTotalPointsForTeamMembers = function(req, cb) {
+	logger.info("In getTotalPointsForTeamMembers");
     var queryString = 'SELECT SUM(points) as total_points,  team_name, email FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id LEFT JOIN userInfo ON activityLog.user_id=userInfo.id WHERE activityLog.team_id = ' + req.session.team_id + " GROUP BY user_id";
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -167,6 +172,7 @@ var getTotalPointsForTeamMembers = function(req, cb) {
 }
 
 var getTotalPointsForAllTeams = function(req, cb) {
+	logger.info("In getTotalPointsForAllTeams");
     var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -202,7 +208,7 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
     the user_id = userName.id AND
     the date is today.
     */
-    
+    logger.info("In getTotalPointsForAllTeams");
     var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(activityDate);
     queryHelper.runQuery(getUserId, 
         function success(rows) {
