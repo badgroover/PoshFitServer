@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `activityMetadata`;
 CREATE TABLE `activityMetadata` (
   `id` int(11) NOT NULL,
   `Category` varchar(40) NOT NULL,
-  `Activity` varchar(40) NOT NULL,
+  `Activity` varchar(80) NOT NULL,
   `Points` int(11) NOT NULL,
   `Duration` int(11) NOT NULL,
   PRIMARY KEY (`id`)
