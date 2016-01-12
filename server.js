@@ -6,13 +6,14 @@ var express       = require('express'),
     bodyParser    = require("body-parser"),
     queryHelper   = require("./QueryHelper.js"),
     _             = require("underscore"),
+    logger        = require('./logger.js'),
     app           = express();
 
 //Set up environment
 var envConfig,
     argv = require('minimist')(process.argv.slice(2));
 
-console.log(argv);
+logger.info(argv);
 
 if(argv.e == "dev") {
     envConfig = require('./config/development.json');  
@@ -22,10 +23,12 @@ if(argv.e == "dev") {
 
 app.use(cookieParser());
 app.use(session({
-  secret: '$#$##@#!',
-  cookieName: 'pmfit',
-  duration: 24 * 60 * 60 * 1000, 
-  activeDuration: 5 * 60 * 1000
+    secret: '$#$##@#!',
+    cookieName: 'pmfit',
+    duration: 24 * 60 * 60 * 1000, 
+    activeDuration: 5 * 60 * 1000,
+    resave: true,
+    saveUninitialized: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -51,7 +54,7 @@ var server = app.listen(envConfig.port, function () {
   var host = server.address().address,
       port = server.address().port;
 
-  console.log('Example app listening at http://%s:%s', host, port);
+  logger.info('Example app listening at http://%s:%s', host, port);
 });
 
 //Find user
@@ -63,16 +66,16 @@ var findUser = function(username, password, callback) {
         function success(rows) {
             if(rows.length == 1) {
                 if(rows[0].email == username && rows[0].password == password) {
-                callback.success(username, rows[0].id, rows[0].team_id);
+                    callback.success(username, rows[0].id, rows[0].team_id);
                 } else {
-               callback.error("Username or Password incorrect");
+                    callback.error("Username or Password incorrect");
                 }   
             } else {
                 callback.error("Username or Password incorrect");
             }
         },
         function error(error) {
-            console.log("Failed Here!");
+            logger.error("Failed in findUser");
             callback.error("Something went wrong. Please try logging in later");
     });
 }
@@ -81,13 +84,10 @@ var findUser = function(username, password, callback) {
 var getAllActivitiesInfo = function(cb) {
     var queryString = 'SELECT * FROM activityMetadata';
     queryHelper.runQuery(queryString, 
-        function success(rows) {
-            console.log("Step 2\n\n");  
-            console.log(cb);  
+        function success(rows) { 
             return cb.success(rows);
         },
         function error(error) {
-            console.log("Step 3\n\n");  
             return cb.error();
     });
 }
@@ -97,12 +97,12 @@ var getTotalPointsForTeam = function(req, cb) {
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length == 1 && rows[0]["SUM(points)"] !== null) {
-                console.log("Team Total");
-                console.log(rows[0]["SUM(points)"]);
+                logger.info("Team Total");
+                logger.info(rows[0]["SUM(points)"]);
                 return cb.success("" + rows[0]["SUM(points)"]);         
             } else {
-                console.log("This team has no points!");
-		var emptyRowsArray = [];
+                logger.info("This team has no points!");
+                var emptyRowsArray = [];
                 return cb.success(emptyRowsArray);         
             }
         },
@@ -116,13 +116,13 @@ var getTotalPointsForTeamMembers = function(req, cb) {
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length !== 0) {
-                console.log("Team Total By individuals");
-		console.log(rows);
+                logger.info("Team Total By individuals");
+                logger.info(rows);
                 return cb.success(rows);         
             } else {
                 //This team has no points
-                console.log("This team has no points!");
-		var emptyArray = [];
+                logger.info("This team has no points!");
+                var emptyArray = [];
                 return cb.success(emptyArray);         
             }
         },
@@ -136,12 +136,12 @@ var getTotalPointsForAllTeams = function(req, cb) {
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length !== 0) {
-                console.log("Team Total");
-                console.log(rows[0]);
-                console.log(rows[0].team_name);
+                logger.info("Team Total");
+                logger.info(rows[0]);
+                logger.info(rows[0].team_name);
                 return cb.success(rows);            
             } else {
-                console.log("This team has no points!");
+                logger.info("This team has no points!");
 		var emptyArray = [];
                 return cb.success(emptyArray);         
             }
@@ -174,7 +174,7 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
             successCb(rows);
         },
         function error(error) {
-            console.log(error);
+            logger.error(error);
             return errorCb();
     });
 }
@@ -186,12 +186,12 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
 					' and date = ' + queryHelper.esc(rowData.date)
 					].join(' ');
 		//Delete the row..
-		console.log("Delete Row");
-		console.log(sql);	
+		logger.info("Delete Row");
+		logger.info(sql);	
 		queryHelper.runQuery(sql, 
 			function success (rows) {
-				console.log("Delete OK");
-				console.log(rows);	
+				logger.info("Delete OK");
+				logger.info(rows);	
                 rowData.isOK = true;
                 successCb();			
 			},
@@ -207,7 +207,7 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
             
 	            //Duration is undefined for Wellbeing and Consumption activities
 	            //Hack to give it a ruration. Maybe client sents 60?
-	            console.log(rowData);
+	            logger.info(rowData);
 				if (typeof rowData.duration === 'undefined') {
 	                rowData.duration = 0;
 	            }
@@ -223,8 +223,8 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
 	                                 ' where user_id = ' + rowData.userId ,
 	                                 ' and activity_id = ' + rowData.activityId,
 	                                 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
-	                    console.log("UPDATE for :");
-	                    console.log(rowData);
+	                    logger.info("UPDATE for :");
+	                    logger.info(rowData);
 	                } else if(rows.length == 0) {
 	                    //new row...insert..
 	                    sql = [
@@ -235,8 +235,8 @@ var updateActivityLog = function(sql, rowData, successCb, errorCb) {
 	                            rowData.duration + ',',
 	                            rowData.points + ',',
 	                            queryHelper.esc(rowData.date) + ')'].join(' ');
-	                    console.log("INSERT SQL :");
-	                    console.log(sql);
+	                    logger.info("INSERT SQL :");
+	                    logger.info(sql);
 	                }
 	            }
 	            queryHelper.runQuery(sql, 
@@ -267,26 +267,26 @@ var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
         rowData.teamId = teamId;
         rowData.isOK = false;
         var sql = getSpecificActivityEntry + ' activity_id = ' + rowData.activityId + ' and date = ' + queryHelper.esc(rowData.date);
-        console.log("Current Row ");
-        console.log(rowData);
+        logger.info("Current Row ");
+        logger.info(rowData);
         
         updateActivityLog(sql, rowData, 
             function success() {
                 //check if all the updates are done...
                 var allComplete = true;
                 for( var j=0; j < numItems; j++) {
-                    console.log("CHECK:");
-                    console.log(data[j]);
+                    logger.info("CHECK:");
+                    logger.info(data[j]);
                     if(data[j].isOK === false) {
                         allComplete = false;
                     }
                 }
                 
                 if(allComplete === true) {
-                    console.log("ALL DONE!")
+                    logger.info("ALL DONE!")
                     successCb();
                 } else {
-                    console.log("WAITING!!")
+                    logger.info("WAITING!!")
                 }
             },
             function error() {
@@ -299,14 +299,13 @@ var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
 //---------------------------------Routes-----------------------------
 //Home Page
 app.get('/', requireLogin, function (req, res) {
-  console.log(req.session);
-  console.log('session name = '+req.session.username+', session password is '+req.session.password);
+  logger.info(req.session);
+  logger.info('session name = '+req.session.username+', session password is '+req.session.password);
   res.redirect('/dashboard');
 });
 
 //Activities Page - shows static list of activities
 app.get('/activities', function (req, res) {
-  console.log('2. Session = '+req.session);
     var callback = {
     success : function success(result) {
       activities = result;
@@ -319,8 +318,8 @@ app.get('/activities', function (req, res) {
     },
     error : function error(err) {
         //return error
-        console.log("Error in activities getAllActivitiesInfo: ");
-        console.log(err);
+        logger.error("Error in activities getAllActivitiesInfo: ");
+        logger.error(err);
         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
         res.render('error', {
             error: error
@@ -340,13 +339,12 @@ app.get('/login',function(req, res){
 
 //Post login info
 app.post('/login',function(req, res){
-  console.log('User name = '+req.body.username+', password is '+req.body.password);
+    logger.info('User name = '+req.body.username+', password is '+req.body.password);
     var callback = {
         success: function success(username, user_id, team_id) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            req.session.email = username
+            req.session.email = username;
             req.session.username = re.exec(username)[1];
-            console.log("USER NAME IS - " + req.session.username)
             req.session.user_id = user_id;
             req.session.team_id = team_id;
             req.session.password = req.body.password;
@@ -372,7 +370,7 @@ app.get('/user/change-password', requireLogin, function(req, res){
 app.post('/user/change-password', requireLogin, function(req, res){
     var callback = {
         success: function success() {
-            console.log("USER NAME IS - " + req.session.username);
+            logger.info("USER NAME IS - " + req.session.username);
             req.session.password = req.body.password;
             res.redirect('/dashboard');
         },
@@ -389,15 +387,15 @@ app.post('/user/change-password', requireLogin, function(req, res){
 app.get('/dashboard', requireLogin, function(req, res){
     var callback = {
         success : function success(result) {
-            console.log("Team result");
-            console.log(result);
+            logger.info("Team result");
+            logger.info(result);
             var userTeamData = result;
 
             var allTeamPointsCallback = {
                 success: function success(result){
                     teamData = result;
-                    console.log("All Teams result");
-                    console.log(teamData);
+                    logger.info("All Teams result");
+                    logger.info(teamData);
 
                     if(teamData) {
                         _.sortBy(teamData, 'total_points'); 
@@ -431,8 +429,8 @@ app.get('/dashboard', requireLogin, function(req, res){
                 },
                 error: function error(result){
                     //return error
-                    console.log("Error in dashboard getTotalPointsForAllTeam: ");
-                    console.log(result);
+                    logger.error("Error in dashboard getTotalPointsForAllTeam: ");
+                    logger.error(result);
                     error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
                     res.render('error', {
                         error: error
@@ -444,8 +442,8 @@ app.get('/dashboard', requireLogin, function(req, res){
         },
         error : function error(err) {
             //return error
-            console.log("Error in dashboard getTotalPointsForByTeamMembers: ");
-            console.log(err);
+            logger.error("Error in dashboard getTotalPointsForByTeamMembers: ");
+            logger.error(err);
             error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
             res.render('error', {
                 error: error
@@ -481,8 +479,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
           function success(result) {
 
             userActivities = result;
-            console.log("USER ACTIVITIES");
-            console.log(userActivities);
+            logger.info("USER ACTIVITIES");
+            logger.info(userActivities);
             _.each(activities, function(activity){
               matchedActivity = _.find(userActivities, function(userActivity){
                 return userActivity.activity_id == activity.id
@@ -503,8 +501,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
         },
         function error(err) {
             //return error
-            console.log("Error in user activities getUserActivityFor:");
-            console.log(err);
+            logger.error("Error in user activities getUserActivityFor:");
+            logger.error(err);
             error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
             res.render('error', {
                 error: error
@@ -513,8 +511,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
       },
       error : function error(err) {
         //return error
-        console.log("Error in user activities getAllActivitiesInfo:");
-        console.log(err);
+        logger.error("Error in user activities getAllActivitiesInfo:");
+        logger.error(err);
         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
         res.render('error', {
             error: error
@@ -546,11 +544,11 @@ app.post('/:username/activities', requireLogin, function(req, res){
           activityData = [];
 
 
-     console.log("Request ");
-     console.log(req.body);
+     logger.info("Request ");
+     logger.info(req.body);
 
      if(req.body.activitySelected){
-        console.log("In selected");
+        logger.info("In selected");
         if(req.body.activitySelected instanceof Array) {
             activityIdsToBeUpdated = req.body.activitySelected;
         } else {
@@ -559,7 +557,7 @@ app.post('/:username/activities', requireLogin, function(req, res){
      }
 
      if(req.body.activityIdDeleted){
-        console.log("In deleted");
+        logger.info("In deleted");
         if(req.body.activityIdDeleted instanceof Array) {
             activityIdsDeleted = req.body.activityIdDeleted;
         } else {
@@ -590,27 +588,27 @@ app.post('/:username/activities', requireLogin, function(req, res){
           })
       }
 
-      console.log("Activity Data  " + activityData);
+      logger.info("Activity Data  " + activityData);
       _.each(activityData, function(data) {
-        console.log(data);
+        logger.info(data);
       });
 
       if(activityData.length > 0) {
         setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
           function success(result) {
-            console.log("FINISHED UPDATING ACTIVITIES!!!");
+            logger.info("FINISHED UPDATING ACTIVITIES!!!");
             res.redirect('/dashboard');
           },
           function error(err) {
-            console.log("Error in set user activities setUserActivityFor:");
-            console.log(err);
+            logger.error("Error in set user activities setUserActivityFor:");
+            logger.error(err);
             error = 'Sorry something went wrong when trying to update data. Please try again later';
             res.render('error', {
                 error: error
             });
           });
       } else {
-        console.log("DID NOT UPDATE ANYTHING!!!");
+        logger.info("DID NOT UPDATE ANYTHING!!!");
         res.end("yes");
       }
 
