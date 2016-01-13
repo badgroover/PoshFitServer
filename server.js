@@ -59,15 +59,15 @@ var server = app.listen(envConfig.port, function () {
 
 //Find user
 var findUser = function(username, password, callback) {
-  	var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
- 
+    var queryString = 'SELECT * FROM userInfo WHERE email = ' + queryHelper.esc(username);
+    logger.info("In findUser");
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length == 1) {
                 if(rows[0].email == username && rows[0].password == password) {
                     callback.success(username, rows[0].id, rows[0].team_id, rows[0].resetFlag);
                 } else {
-               		callback.error("Username or Password incorrect");
+                    callback.error("Username or Password incorrect");
                 }   
             } else {
                 callback.error("Username or Password incorrect");
@@ -81,33 +81,35 @@ var findUser = function(username, password, callback) {
 
 //Reset password
 var resetPassword = function(user_id, username, password, callback) {
-	var sql = ['update userInfo set password = ' + queryHelper.esc(password),
+    logger.info("In resetPassword");
+    var sql = ['update userInfo set password = ' + queryHelper.esc(password),
                  ', resetFlag = 0',
- 				' where id = ' + user_id
-				].join(' ');
+                ' where id = ' + user_id
+                ].join(' ');
  
     queryHelper.runQuery(sql, 
         function success(rows) {
-			//Password reset succeeded.
-			console.log("Pswd reset OK!")
-			callback.success();
+            //Password reset succeeded.
+            logger.info("Pswd reset OK!")
+            callback.success();
         },
         function error(error) {
-            console.log("Pswd reset Fail!")
-            callback.error("Something went wrong will resetting password. Please try later");
+            logger.info("Pswd reset Fail!")     
+            logger.error("Something went wrong will resetting password. Please try later");
     });
 }
 
 var getDashboardMessage = function(cb) {
-	var sql = "SELECT * from dashboardMessage";
-	queryHelper.runQuery(sql, 
+    logger.info("In getDashboardMessage");
+    var sql = "SELECT * from dashboardMessage";
+    queryHelper.runQuery(sql, 
         function success(rows) {
             logger.info("Got dashboard message");  
             if(rows.length == 1) {
-				return cb.success(rows[0].message);
-			} else {
-				return cb.success("");
-			}
+                return cb.success(rows[0].message);
+            } else {
+                return cb.success("");
+            }
         },
         function error(error) {
             return cb.error("");
@@ -117,7 +119,8 @@ var getDashboardMessage = function(cb) {
 
 //test to confirm json results from db query
 var getAllActivitiesInfo = function(cb) {
-    var queryString = 'SELECT * FROM activityMetadata';
+    logger.info("In getAllActivitiesInfo");
+    var queryString = 'SELECT * FROM activityMetadata order by Activity';
     queryHelper.runQuery(queryString, 
         function success(rows) { 
             return cb.success(rows);
@@ -128,6 +131,7 @@ var getAllActivitiesInfo = function(cb) {
 }
 
 var getTotalPointsForTeam = function(req, cb) {
+    logger.info("In getTotalPointsForTeam");
     var queryString = 'SELECT SUM(points) as total_points FROM activityLog WHERE team_id = ' + req.session.team_id;
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -147,6 +151,7 @@ var getTotalPointsForTeam = function(req, cb) {
 }
 
 var getTotalPointsForTeamMembers = function(req, cb) {
+    logger.info("In getTotalPointsForTeamMembers");
     var queryString = 'SELECT SUM(points) as total_points,  team_name, email FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id LEFT JOIN userInfo ON activityLog.user_id=userInfo.id WHERE activityLog.team_id = ' + req.session.team_id + " GROUP BY user_id";
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -167,6 +172,7 @@ var getTotalPointsForTeamMembers = function(req, cb) {
 }
 
 var getTotalPointsForAllTeams = function(req, cb) {
+    logger.info("In getTotalPointsForAllTeams");
     var queryString = 'SELECT SUM(points) as total_points, team_name FROM activityLog LEFT JOIN teamMetadata ON activityLog.team_id=teamMetadata.id GROUP BY team_id';
     queryHelper.runQuery(queryString, 
         function success(rows) {
@@ -177,7 +183,7 @@ var getTotalPointsForAllTeams = function(req, cb) {
                 return cb.success(rows);            
             } else {
                 logger.info("This team has no points!");
-		var emptyArray = [];
+        var emptyArray = [];
                 return cb.success(emptyArray);         
             }
         },
@@ -202,7 +208,7 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
     the user_id = userName.id AND
     the date is today.
     */
-    
+    logger.info("In getTotalPointsForAllTeams");
     var getUserId = 'SELECT * FROM activityLog where user_id = ' + id  + " and date = " + queryHelper.esc(activityDate);
     queryHelper.runQuery(getUserId, 
         function success(rows) {
@@ -215,81 +221,81 @@ var getUserActivityFor = function(id, activityDate, successCb, errorCb) {
 }
 var updateActivityLog = function(sql, rowData, successCb, errorCb) {
     if(rowData.deleted === true) {
-		var sql = [ 'delete from activityLog where ',
-					' user_id = ' + rowData.userId ,
-					' and activity_id = ' + rowData.activityId,
-					' and date = ' + queryHelper.esc(rowData.date)
-					].join(' ');
-		//Delete the row..
-		logger.info("Delete Row");
-		logger.info(sql);	
-		queryHelper.runQuery(sql, 
-			function success (rows) {
-				logger.info("Delete OK");
-				logger.info(rows);	
+        var sql = [ 'delete from activityLog where ',
+                    ' user_id = ' + rowData.userId ,
+                    ' and activity_id = ' + rowData.activityId,
+                    ' and date = ' + queryHelper.esc(rowData.date)
+                    ].join(' ');
+        //Delete the row..
+        logger.info("Delete Row");
+        logger.info(sql);   
+        queryHelper.runQuery(sql, 
+            function success (rows) {
+                logger.info("Delete OK");
+                logger.info(rows);  
                 rowData.isOK = true;
-                successCb();			
-			},
-			function error (error) {
+                successCb();            
+            },
+            function error (error) {
                 rowData.isOK = false;
-                errorCb();			
-			}
-		);			
-	} else {
-		queryHelper.runQuery(sql,
-	        function success (rows) {
-	            var sql;
+                errorCb();          
+            }
+        );          
+    } else {
+        queryHelper.runQuery(sql,
+            function success (rows) {
+                var sql;
             
-	            //Duration is undefined for Wellbeing and Consumption activities
-	            //Hack to give it a ruration. Maybe client sents 60?
-	            logger.info(rowData);
-				if (typeof rowData.duration === 'undefined') {
-	                rowData.duration = 0;
-	            }
+                //Duration is undefined for Wellbeing and Consumption activities
+                //Hack to give it a ruration. Maybe client sents 60?
+                logger.info(rowData);
+                if (typeof rowData.duration === 'undefined') {
+                    rowData.duration = 0;
+                }
                 
-	            if(rowData.deleted === true) {
-	                //clear out this row
-	            } else {
-	                if(rows.length == 1) {
-	                    //found a prev entry...update..
-	                    sql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
-	                                 ' ,duration = ' + rowData.duration,
-	                                 ' ,points = ' + rowData.points,
-	                                 ' where user_id = ' + rowData.userId ,
-	                                 ' and activity_id = ' + rowData.activityId,
-	                                 ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
-	                    logger.info("UPDATE for :");
-	                    logger.info(rowData);
-	                } else if(rows.length == 0) {
-	                    //new row...insert..
-	                    sql = [
-	                            'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
-	                            rowData.userId + ',',
-	                            rowData.teamId + ',',
-	                            rowData.activityId + ',',
-	                            rowData.duration + ',',
-	                            rowData.points + ',',
-	                            queryHelper.esc(rowData.date) + ')'].join(' ');
-	                    logger.info("INSERT SQL :");
-	                    logger.info(sql);
-	                }
-	            }
-	            queryHelper.runQuery(sql, 
-	                function success() {
-	                    rowData.isOK = true;
-	                    successCb();
-	                },
-	                function error() {
-	                    rowData.isOK = false;
-	                    errorCb();
-	                })
+                if(rowData.deleted === true) {
+                    //clear out this row
+                } else {
+                    if(rows.length == 1) {
+                        //found a prev entry...update..
+                        sql = ['update activityLog set date = ' + queryHelper.esc(rowData.date),
+                                     ' ,duration = ' + rowData.duration,
+                                     ' ,points = ' + rowData.points,
+                                     ' where user_id = ' + rowData.userId ,
+                                     ' and activity_id = ' + rowData.activityId,
+                                     ' and date = ' + queryHelper.esc(rowData.date)].join(' ');
+                        logger.info("UPDATE for :");
+                        logger.info(rowData);
+                    } else if(rows.length == 0) {
+                        //new row...insert..
+                        sql = [
+                                'insert into activityLog (user_id, team_id, activity_id, duration, points, date) values (',
+                                rowData.userId + ',',
+                                rowData.teamId + ',',
+                                rowData.activityId + ',',
+                                rowData.duration + ',',
+                                rowData.points + ',',
+                                queryHelper.esc(rowData.date) + ')'].join(' ');
+                        logger.info("INSERT SQL :");
+                        logger.info(sql);
+                    }
+                }
+                queryHelper.runQuery(sql, 
+                    function success() {
+                        rowData.isOK = true;
+                        successCb();
+                    },
+                    function error() {
+                        rowData.isOK = false;
+                        errorCb();
+                    })
             
-	        },
-	        function error(error) {
-	            errorCb();
-	        }
-	    );
-	}
+            },
+            function error(error) {
+                errorCb();
+            }
+        );
+    }
 }
 var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
     var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
@@ -377,24 +383,24 @@ app.post('/login',function(req, res){
     logger.info('User name = '+req.body.username+', password is '+req.body.password);
     var callback = {
         success: function success(username, user_id, team_id, resetPassword) {
-			var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             req.session.email = username
             req.session.username = re.exec(username)[1];
             req.session.user_id = user_id;
             req.session.team_id = team_id;
-			logger.info("Reset password flag");
-			logger.info(resetPassword);
+            logger.info("Reset password flag");
+            logger.info(resetPassword);
 
             if(resetPassword == 1) {
-				console.log("Reset password");
-			    res.render('resetPassword', {
-			        error: ""
-			    });
-			} else {
-				req.session.password = req.body.password;
-				res.redirect('/dashboard');
-			}
-			
+                console.log("Reset password");
+                res.render('resetPassword', {
+                    error: ""
+                });
+            } else {
+                req.session.password = req.body.password;
+                res.redirect('/dashboard');
+            }
+            
         },
         error: function error(error) {
             res.render('login', {
@@ -449,7 +455,7 @@ app.get('/dashboard', requireLogin, function(req, res){
 
                     var dashboardMessageCallback = {
                         success: function success(message) {
-							res.render('dashboard', {
+                            res.render('dashboard', {
                                 userTeamData: userTeamData,
                                 teamData: teamData,
                                 dashboardMessage: message
@@ -490,7 +496,7 @@ app.get('/dashboard', requireLogin, function(req, res){
             });
         }
         };
-	getTotalPointsForTeamMembers(req, callback);
+    getTotalPointsForTeamMembers(req, callback);
 });
 
 //About page
