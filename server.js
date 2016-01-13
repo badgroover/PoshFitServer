@@ -301,6 +301,7 @@ var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
     var getSpecificActivityEntry = 'SELECT * FROM activityLog where user_id = ' + userId + " and ";
 
     var numItems = data.length;
+    var hasErroredOut = false;
 
     for(var i=0; (i< numItems); i++) {
         var rowData = data[i];
@@ -331,7 +332,12 @@ var setUserActivityFor = function(userId, teamId, data, successCb, errorCb) {
                 }
             },
             function error() {
-                errorCb();
+                if(hasErroredOut === false) {
+                    logger.info(" Errored Out!")
+                    console.log("Errored out");
+                    hasErroredOut = true;
+                    errorCb();
+                } 
             }
         );
     }
