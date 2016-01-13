@@ -1,5 +1,5 @@
     var mysql         = require('mysql');
-	var logger        = require('./logger.js');
+    var logger        = require('./logger.js');
     
     var envConfig;
     var argv = require('minimist')(process.argv.slice(2));
@@ -34,6 +34,7 @@
                 connection.release();
                 if(!err) {
                     logger.info("Query Success");
+                    logger.info(rows);
                     onSuccess(rows);
                 } else {
                     logger.info("Query Error");
