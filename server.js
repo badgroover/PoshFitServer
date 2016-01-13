@@ -456,7 +456,9 @@ app.get('/dashboard', requireLogin, function(req, res){
                     logger.info(teamData);
 
                     if(teamData) {
-                        _.sortBy(teamData, 'total_points'); 
+                        teamData.sort(function(team1, team2) {
+                            return team1.total_points - team2.total_points;
+                        });
                     }
 
                     var dashboardMessageCallback = {
