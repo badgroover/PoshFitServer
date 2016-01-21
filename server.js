@@ -130,6 +130,19 @@ var getAllActivitiesInfo = function(cb) {
     });
 }
 
+var getConsolidatedDataDump = function(cb) {
+    logger.info("In getAllActivitiesInfo");
+    var queryString = 'select * from activityLog left join teamMetadata on activityLog.team_id = teamMetadata.id left join userInfo on activityLog.user_id=userInfo.id left join activityMetadata on activityLog.activity_id = activityMetadata.id';
+    queryHelper.runQuery(queryString, 
+        function success(rows) { 
+            return cb.success(rows);
+        },
+        function error(error) {
+            return cb.error();
+    });
+}
+
+
 var getTotalPointsForTeam = function(req, cb) {
     logger.info("In getTotalPointsForTeam");
     var queryString = 'SELECT SUM(points) as total_points FROM activityLog WHERE team_id = ' + req.session.team_id;
@@ -683,6 +696,28 @@ app.get('/logout', requireLogin, function(req, res){
   req.session.destroy();
   res.redirect('/login');
 });
+
+// End point to return raw data for Tableau Web Data Connection
+//ToDO: check for credentials
+app.get('/TDC', function(req, res){
+  console.log("From Tableau!!");
+    var callback = {
+    success : function success(result) {
+		var data = {};
+		data.stuff = result;
+		res.send(data);
+    },
+    error : function error(err) {
+        //return error
+        logger.error("Error in activities getAllActivitiesInfo: ");
+        logger.error(err);
+        error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+    }
+  };
+  getConsolidatedDataDump(callback);
+  //getAllActivitiesInfo(callback);
+});
+
 
 // Error handlers
 
