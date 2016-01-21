@@ -1,0 +1,69 @@
+<html>
+<meta http-equiv="Cache-Control" content="no-store" />
+<head>
+  <title>Poshfit Web Data Connector</title>
+  <script src="https://online.tableau.com/javascripts/api/tableauwdc-1.1.0.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+  (function() {
+      var myConnector = tableau.makeConnector();
+      myConnector.getColumnHeaders = function() {
+		var fieldNames =     ['user_id', 'activity_id', 'email', 'Points', 'Duration', 'team_name', 'date',   'Activity', 'Category'];
+		    var fieldTypes = ['int',     'int',         'string', 'int',    'int',      'string',     'date',  'string',   'string'];
+		    tableau.headersCallback(fieldNames, fieldTypes);      
+	  }
+
+      myConnector.getTableData = function(lastRecordToken) {
+		var dataToReturn = [];
+		    var hasMoreData = false;
+
+		    var xhr = $.ajax({
+		      url: 'http://localhost:8083/TDC',
+		      dataType: 'json',
+		      success: function (data) {
+		          if (data) {
+		              var ii;
+
+		              for (ii = 0; ii < data.stuff.length; ++ii) {
+		                  var entry = {'user_id': data.stuff[ii].user_id,
+		                               'activity_id': data.stuff[ii].activity_id,
+		                               'Duration': data.stuff[ii].duration,
+		                               'date': data.stuff[ii].date,
+		                               'team_name': data.stuff[ii].team_name,
+                                       'Points': data.stuff[ii].points,
+                                       'email': data.stuff[ii].email,
+                                       'Activity': data.stuff[ii].Activity,
+                                       'Category': data.stuff[ii].Category
+		                               };
+		                  dataToReturn.push(entry);
+		              }
+					tableau.dataCallback(dataToReturn, "dfg", false);
+
+		            }
+		            else {
+		              tableau.abortWithError("No results found for ticker symbol: " + ticker);
+		            }
+		      },
+		      error: function (xhr, ajaxOptions, thrownError) {
+		          // If the connection fails, log the error and return an empty set.
+		          tableau.log("Connection error: " + xhr + "\n" + thrownError);
+		          tableau.abortWithError("Error while trying to connecto to Poshfit data source.");
+		      }
+		    });
+	   }
+      tableau.registerConnector(myConnector);
+  })();
+	$(document).ready(function() {
+	    $("#submitButton").click(function() {
+	        tableau.connectionName = "Stock Data for Poshmark";
+	        tableau.connectionData = "DATA";
+	        tableau.submit();
+	    });
+	  });
+  </script>
+</head>
+<body>
+	  <p><button type="button" id="submitButton">Get the Data</button></p>
+</body>
+</html>
