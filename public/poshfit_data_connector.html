@@ -10,7 +10,7 @@
       var myConnector = tableau.makeConnector();
       myConnector.getColumnHeaders = function() {
 		var fieldNames =     ['user_id', 'activity_id', 'email', 'Points', 'Duration', 'team_name', 'date',   'Activity', 'Category'];
-		    var fieldTypes = ['int',     'int',         'string', 'int',    'int',      'string',     'date',  'string',   'string'];
+		    var fieldTypes = ['int',     'int',         'string', 'float',    'int',      'string',     'date',  'string',   'string'];
 		    tableau.headersCallback(fieldNames, fieldTypes);      
 	  }
 
