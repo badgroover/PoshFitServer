@@ -132,7 +132,7 @@ var getAllActivitiesInfo = function(cb) {
 
 var getConsolidatedDataDump = function(cb) {
     logger.info("In getAllActivitiesInfo");
-    var queryString = 'select * from activityLog left join teamMetadata on activityLog.team_id = teamMetadata.id left join userInfo on activityLog.user_id=userInfo.id left join activityMetadata on activityLog.activity_id = activityMetadata.id';
+    var queryString = 'select * from activityLog right join userInfo on activityLog.user_id=userInfo.id left join activityMetadata on activityLog.activity_id=activityMetadata.id left join teamMetadata on activityLog.team_id=teamMetadata.id';
     queryHelper.runQuery(queryString, 
         function success(rows) { 
             return cb.success(rows);
