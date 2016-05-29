@@ -99,7 +99,7 @@ INSERT INTO `activityMetadata` VALUES
 (31,'Physical Activity','Weight Training',2,60),
 (32,'Physical Activity','Yoga / Pilates ',2,60),
 (33,'Physical Activity','Dancing ',2,60),
-(34,'Physical Activity','Ultimate Frisbee ‘,4,60),
+(34,'Physical Activity','Ultimate Frisbee ',4,60),
 (35,'Physical Activity','Volleyball ',2,60),
 (36,'Physical Activity','Zumba',3,60),
 (37,'Physical Activity','Swimming ',4,60),
