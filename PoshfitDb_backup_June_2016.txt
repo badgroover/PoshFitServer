@@ -111,7 +111,7 @@ CREATE TABLE `teamMetadata` (
 LOCK TABLES `teamMetadata` WRITE;
 /*!40000 ALTER TABLE `teamMetadata` DISABLE KEYS */;
 INSERT INTO `teamMetadata` VALUES 
-(1,'test_team1’);
+(1,'test_team1');
 /*!40000 ALTER TABLE `teamMetadata` ENABLE KEYS */;
 UNLOCK TABLES;
 
