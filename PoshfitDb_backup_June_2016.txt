@@ -111,21 +111,7 @@ CREATE TABLE `teamMetadata` (
 LOCK TABLES `teamMetadata` WRITE;
 /*!40000 ALTER TABLE `teamMetadata` DISABLE KEYS */;
 INSERT INTO `teamMetadata` VALUES 
-(1,'test_team1'),
-(2,'test_team2'),
-(3,'Return of the Champions'),
-(4,'Pound Droppers'),
-(5,'Chittis'),
-(6,'SKCCM'),
-(7,'Game of Tone'),
-(8,’jeff_jennie_marie’),
-(9,’tbd’),
-(10,’PoshIt’),
-(11,'amandaw_christinat_eunice’),
-(12,’tracy_amanda_shazia_caitlin’),
-(13,’Andrego_kalpak_ketan’),
-(14,'Slayyyers’),
-(15,’goshslims');
+(1,'test_team1’);
 /*!40000 ALTER TABLE `teamMetadata` ENABLE KEYS */;
 UNLOCK TABLES;
 
