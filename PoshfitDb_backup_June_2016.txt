@@ -115,8 +115,8 @@ INSERT INTO `activityMetadata` VALUES
 (47,'Consumption','2 servings of Veggies',2,0),
 (48,'Physical Activity','Cricket ',2,60),
 (49,'Physical Activity','Badminton ',3,60),
-(50,'Physical Activity','PingPong ‘,1,60),
-(51,'Physical Activity','10,000 steps (Fitbit/Apple Watch) ‘,2,0);
+(50,'Physical Activity','PingPong',1,60),
+(51,'Physical Activity','10,000 steps (Fitbit/Apple Watch)',2,0);
 /*!40000 ALTER TABLE `activityMetadata` ENABLE KEYS */;
 UNLOCK TABLES;
 
