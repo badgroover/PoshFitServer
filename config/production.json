@@ -3,7 +3,7 @@
 		"host": "127.0.0.1",
 		"user": "ec2-user",
 		"password": "",
-		"db": "PoshfitDb"
+		"db": "PoshfitDb_June_2016"
 	},
 	"startDate": "2016-1-12",
 	"dayBeforeStartDate": "2016-1-11",
