@@ -531,65 +531,65 @@ app.get('/:username/activities', requireLogin, function(req, res){
   if(req.session.username == req.params.username){
 
     // adding a redirect to the dashboard for the end of the competition
-    res.redirect('/dashboard');
+    //res.redirect('/dashboard');
 
-    // var callback = {
-    //   success : function success(result) {  
-    //     var activities = result,
-    //       today;
+     var callback = {
+       success : function success(result) {  
+         var activities = result,
+           today;
 
-    //     if(req.query.for) {
-    //       activityDate = req.query.for;  
-    //     } else {
-    //       today = new Date();
-    //       activityDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-    //     }
+         if(req.query.for) {
+           activityDate = req.query.for;  
+         } else {
+           today = new Date();
+           activityDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+         }
 
-    //     getUserActivityFor(req.session.user_id, activityDate, 
-    //       function success(result) {
+         getUserActivityFor(req.session.user_id, activityDate, 
+           function success(result) {
 
-    //         userActivities = result;
-    //         logger.info("USER ACTIVITIES");
-    //         logger.info(userActivities);
-    //         _.each(activities, function(activity){
-    //           matchedActivity = _.find(userActivities, function(userActivity){
-    //             return userActivity.activity_id == activity.id
-    //           })
-    //           if(matchedActivity) {
-    //           _.extend(activity, {'userActivity': matchedActivity})
-    //           }
-    //         });
+             userActivities = result;
+             logger.info("USER ACTIVITIES");
+             logger.info(userActivities);
+             _.each(activities, function(activity){
+               matchedActivity = _.find(userActivities, function(userActivity){
+                 return userActivity.activity_id == activity.id
+               })
+               if(matchedActivity) {
+               _.extend(activity, {'userActivity': matchedActivity})
+               }
+             });
 
-    //         activitiesByCategory = _.groupBy(activities, function(activity){
-    //           return activity.Category;
-    //         });
+             activitiesByCategory = _.groupBy(activities, function(activity){
+               return activity.Category;
+             });
 
-    //         res.render('user/activities', {
-    //           activitiesByCategory: activitiesByCategory,
-    //           displayDate: activityDate
-    //         });
-    //     },
-    //     function error(err) {
-    //         //return error
-    //         logger.error("Error in user activities getUserActivityFor:");
-    //         logger.error(err);
-    //         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
-    //         res.render('error', {
-    //             error: error
-    //         });
-    //     });
-    //   },
-    //   error : function error(err) {
-    //     //return error
-    //     logger.error("Error in user activities getAllActivitiesInfo:");
-    //     logger.error(err);
-    //     error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
-    //     res.render('error', {
-    //         error: error
-    //     });
-    //   }
-    // };
-    // getAllActivitiesInfo(callback);
+             res.render('user/activities', {
+               activitiesByCategory: activitiesByCategory,
+               displayDate: activityDate
+             });
+         },
+         function error(err) {
+             //return error
+             logger.error("Error in user activities getUserActivityFor:");
+             logger.error(err);
+             error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+             res.render('error', {
+                 error: error
+             });
+         });
+       },
+       error : function error(err) {
+         //return error
+         logger.error("Error in user activities getAllActivitiesInfo:");
+         logger.error(err);
+         error = 'Sorry something went wrong when trying to retrieve data. Please try again later';
+         res.render('error', {
+             error: error
+         });
+       }
+     };
+     getAllActivitiesInfo(callback);
   } else {
     error = 'Username doesn\'t match the user logged in';
     res.render('error', {
@@ -603,87 +603,87 @@ app.post('/:username/activities', requireLogin, function(req, res){
     if(req.session.username == req.params.username){
 
       // adding a redirect to the dashboard for the end of the competition
-      res.redirect('/dashboard');
+      //res.redirect('/dashboard');
 
-     //  var activityIdsToBeUpdated,
-     //      activityDuration = _.filter(req.body.activityDuration, function(value){
-     //          return value !== "";
-     //      }),
-     //      activityDate = req.body.activityDate,
-     //      activityPoints = _.filter(req.body.activityTotalPoints, function(value){
-     //          return value !== "";
-     //      }),
-     //      activityIdsDeleted,
-     //      activityData = [];
+       var activityIdsToBeUpdated,
+           activityDuration = _.filter(req.body.activityDuration, function(value){
+               return value !== "";
+           }),
+           activityDate = req.body.activityDate,
+           activityPoints = _.filter(req.body.activityTotalPoints, function(value){
+               return value !== "";
+           }),
+           activityIdsDeleted,
+           activityData = [];
 
 
-     // logger.info("Request ");
-     // logger.info(req.body);
+      logger.info("Request ");
+      logger.info(req.body);
 
-     // if(req.body.activitySelected){
-     //    logger.info("In selected");
-     //    if(req.body.activitySelected instanceof Array) {
-     //        activityIdsToBeUpdated = req.body.activitySelected;
-     //    } else {
-     //        activityIdsToBeUpdated = [req.body.activitySelected];
-     //    }
-     // }
+      if(req.body.activitySelected){
+         logger.info("In selected");
+         if(req.body.activitySelected instanceof Array) {
+             activityIdsToBeUpdated = req.body.activitySelected;
+         } else {
+             activityIdsToBeUpdated = [req.body.activitySelected];
+         }
+      }
 
-     // if(req.body.activityIdDeleted){
-     //    logger.info("In deleted");
-     //    if(req.body.activityIdDeleted instanceof Array) {
-     //        activityIdsDeleted = req.body.activityIdDeleted;
-     //    } else {
-     //        activityIdsDeleted = [req.body.activityIdDeleted];
-     //    }
-     // }
+      if(req.body.activityIdDeleted){
+         logger.info("In deleted");
+         if(req.body.activityIdDeleted instanceof Array) {
+             activityIdsDeleted = req.body.activityIdDeleted;
+         } else {
+             activityIdsDeleted = [req.body.activityIdDeleted];
+         }
+      }
 
-     //  if(activityIdsToBeUpdated && activityIdsToBeUpdated.length > 0) {
-     //      _.each(activityIdsToBeUpdated, function(activityId, i) {
-     //        activityData.push({
-     //          "activityId": activityId,
-     //          "duration": activityDuration[i],
-     //          "points": activityPoints[i],
-     //          "date": activityDate
-     //        });
-     //      });
-     //  }
+       if(activityIdsToBeUpdated && activityIdsToBeUpdated.length > 0) {
+           _.each(activityIdsToBeUpdated, function(activityId, i) {
+             activityData.push({
+               "activityId": activityId,
+               "duration": activityDuration[i],
+               "points": activityPoints[i],
+               "date": activityDate
+             });
+           });
+       }
 
-     //  if(activityIdsDeleted && activityIdsDeleted.length > 0) {
-     //    _.each(activityIdsDeleted, function(activityId, i){
-     //        activityData.push({
-     //          "activityId": activityId,
-     //          "duration": 0,
-     //          "points": 0.0,
-     //          "date": activityDate,
-     //          "deleted": true
-     //        });
-     //      })
-     //  }
+       if(activityIdsDeleted && activityIdsDeleted.length > 0) {
+         _.each(activityIdsDeleted, function(activityId, i){
+             activityData.push({
+               "activityId": activityId,
+               "duration": 0,
+               "points": 0.0,
+               "date": activityDate,
+               "deleted": true
+             });
+           })
+       }
 
-     //  logger.info("Activity Data  " + activityData);
-     //  _.each(activityData, function(data) {
-     //    logger.info(data);
-     //  });
+       logger.info("Activity Data  " + activityData);
+       _.each(activityData, function(data) {
+         logger.info(data);
+       });
 
-     //  if(activityData.length > 0) {
-     //    setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
-     //      function success(result) {
-     //        logger.info("FINISHED UPDATING ACTIVITIES!!!");
-     //        res.redirect('/dashboard');
-     //      },
-     //      function error(err) {
-     //        logger.error("Error in set user activities setUserActivityFor:");
-     //        logger.error(err);
-     //        error = 'Sorry something went wrong when trying to update data. Please try again later';
-     //        res.render('error', {
-     //            error: error
-     //        });
-     //      });
-     //  } else {
-     //    logger.info("DID NOT UPDATE ANYTHING!!!");
-     //    res.end("yes");
-     //  }
+       if(activityData.length > 0) {
+         setUserActivityFor(req.session.user_id, req.session.team_id, activityData, 
+           function success(result) {
+             logger.info("FINISHED UPDATING ACTIVITIES!!!");
+             res.redirect('/dashboard');
+           },
+           function error(err) {
+             logger.error("Error in set user activities setUserActivityFor:");
+             logger.error(err);
+             error = 'Sorry something went wrong when trying to update data. Please try again later';
+             res.render('error', {
+                 error: error
+             });
+           });
+       } else {
+         logger.info("DID NOT UPDATE ANYTHING!!!");
+         res.end("yes");
+       }
 
 
     } else {
