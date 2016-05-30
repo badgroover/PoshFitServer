@@ -29,8 +29,10 @@ $(document).ready(function(){
 
 	$("table #activities #user-selected:checked").each(function(){
 		var row = $(this).parent().parent(),
-			activityId = $(row).find("#activity").data("activity-id");
+			activityId = $(row).find("#activity").data("activity-id"),
+			category = $(row).find("#activity").data("category");
 		selectedActivityIds.push(activityId);
+		alert("Category for activity " + category);
 	});
 
 	console.log(selectedActivityIds);
