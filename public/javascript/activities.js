@@ -73,7 +73,7 @@ $(document).ready(function(){
       yesterday.setDate(yesterday.getDate() - 1);
       yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
 
-      if((activityDate === currentDate || activityDate === yesterdaysDate) && activityDate !== dayBeforeStartDate) {
+      if((activityDate === currentDate || activityDate === yesterdaysDate) && activityDate.toTime() > startDate.getTime()) {
       	if(activityDate == currentDate){
       		submissionDate = currentDate;
       	} else {
@@ -132,8 +132,8 @@ $(document).ready(function(){
   		return true;
 	}
       } else {
-      	if(yesterdaysDate === dayBeforeStartDate){
-      		alert("The challenge started today. Don't try to enter data for yesterday!");
+      	if(activityDate.getTime() < startDate.getTime()){
+      		alert("The challenge has not started yet. Patience!");
       	} else {
       		alert("Too late to submit data for " + activityDate + " !");
       	}
