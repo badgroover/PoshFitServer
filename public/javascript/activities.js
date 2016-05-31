@@ -87,9 +87,9 @@ $(document).ready(function(){
 			activity = $(row).find("#activity").text(),
 			category = $(row).find("#category").data("category");
 		
-		alert(category);
 		if(activityTotalPoints && activityTotalPoints > 0){
 			if(category === "Physical") {
+				alert(category);
 				totalPointsForPhysical += activityTotalPoints
 			}
 		}
