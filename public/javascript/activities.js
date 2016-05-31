@@ -90,7 +90,6 @@ $(document).ready(function(){
 		if(activityTotalPoints && activityTotalPoints > 0){
 			if(category === "Physical") {
 				totalPointsForPhysical += parseInt(activityTotalPoints);
-				alert(totalPointsForPhysical);
 			}
 		}
 
