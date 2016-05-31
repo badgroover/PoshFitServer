@@ -30,7 +30,7 @@
 			</tr>
 			<% activitiesByCategory[category].forEach(function(activity){ %>
 				<tr id="activities">		
-					<td>category</td>
+					<td><%= category %></td>
 					<td id="activity" data-activity-id=<%= activity.id%>><%= activity.Activity %></td>
 					<td id="activity-points" data-activity-points=<%= activity.Points%> data-activity-duration=<%= activity.Duration%>><%= activity.Points %> for <%= activity.Duration %> minutes</td>
 					<% if(activity.userActivity){ %>
