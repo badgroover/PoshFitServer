@@ -29,10 +29,8 @@ $(document).ready(function(){
 
 	$("table #activities #user-selected:checked").each(function(){
 		var row = $(this).parent().parent(),
-			activityId = $(row).find("#activity").data("activity-id"),
-			category = $(row).find("#category").data("category");
+			activityId = $(row).find("#activity").data("activity-id");
 		selectedActivityIds.push(activityId);
-		alert("Category for activity " + category);
 	});
 
 	console.log(selectedActivityIds);
@@ -60,7 +58,7 @@ $(document).ready(function(){
 
  	// add the date stamp before form submit
 
- 	$("#activity-form").submit( function(eventObj) {
+ $("#activity-form").submit( function(eventObj) {
  		
       // Get current time and check it against the time with which the page was loaded.
       var today = new Date(),
@@ -69,7 +67,8 @@ $(document).ready(function(){
       	  submissionDate,
       	  currentDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate(),
       	  form = $("#activity-form"),
-      	  allValuesEntered = false;
+      	  allValuesEntered = false,
+      	  totalPointsForPhysical=0;
 
       yesterday.setDate(yesterday.getDate() - 1);
       yesterdaysDate = yesterday.getFullYear() + "-" + (yesterday.getMonth() + 1) + "-" + yesterday.getDate();
@@ -81,46 +80,58 @@ $(document).ready(function(){
       		submissionDate = yesterdaysDate
       	}
 
-		// check if all selected values have duration and points calculated
-		$("table #activities #user-selected:checked").each(function(){
-			var row = $(this).parent().parent(),
-				activityTotalPoints = $(row).find("#total-points").val(),
-				activity = $(row).find("#activity").text();
-			if(activityTotalPoints && activityTotalPoints > 0){
-				allValuesEntered = true;
-			} else {
-				allValuesEntered = false;
-				alert("Please enter a duration for " + activity);
-				eventObj.preventDefault();
-				return false;
+	// check if all selected values have duration and points calculated
+	$("table #activities #user-selected:checked").each(function(){
+		var row = $(this).parent().parent(),
+			activityTotalPoints = $(row).find("#total-points").val(),
+			activity = $(row).find("#activity").text(),
+			category = $(row).find("#category").data("category");
+		
+		
+		if(activityTotalPoints && activityTotalPoints > 0){
+			if(category === "Physical") {
+				totalPointsForPhysical += activityTotalPoints
+			}
+		}
+
+		if(activityTotalPoints && activityTotalPoints > 0){
+			allValuesEntered = true;
+		} else {
+			allValuesEntered = false;
+			alert("Please enter a duration for " + activity);
+			eventObj.preventDefault();
+			return false;
+		}
+	});
+	
+	if(totalPointsForPhysical > 10) {
+		alert("Physical Activity points > 10!");	
+		return false;
+	}
+
+	if(allValuesEntered) {
+		var formValue = {};
+		$.each($(form).serializeArray(), function(i, field) {
+			if(field.name === "activitySelected") {
+				if(formValue[field.name]) {
+					formValue[field.name].push(field.value);		
+				} else {
+					formValue[field.name] = [];
+					formValue[field.name].push(field.value);
+				}	
 			}
 		});
 
-		if(allValuesEntered) {
-			var formValue = {};
-			$.each($(form).serializeArray(), function(i, field) {
-				if(field.name === "activitySelected") {
-					if(formValue[field.name]) {
-						formValue[field.name].push(field.value);		
-					} else {
-						formValue[field.name] = [];
-						formValue[field.name].push(field.value);
-					}	
-				}
-			});
-
-			// check if any selected activities are unselected 
-	    	$.each(selectedActivityIds, function( index, value ) {
-	  			if($.inArray(value.toString(), formValue["activitySelected"]) == -1){
-					$(form).append('<input name="activityIdDeleted" value="'+ value +'" /> ');	
-	  			}
-			});
-	  	
-	  		$(this).append('<input type="hidden" name="activityDate" value="'+ submissionDate +'" /> ');	
-	  		return true;
-		}
-
-
+		// check if any selected activities are unselected 
+    		$.each(selectedActivityIds, function( index, value ) {
+  			if($.inArray(value.toString(), formValue["activitySelected"]) == -1){
+				$(form).append('<input name="activityIdDeleted" value="'+ value +'" /> ');	
+  			}
+		});
+  	
+  		$(this).append('<input type="hidden" name="activityDate" value="'+ submissionDate +'" /> ');	
+  		return true;
+	}
       } else {
       	if(yesterdaysDate === dayBeforeStartDate){
       		alert("The challenge started today. Don't try to enter data for yesterday!");
