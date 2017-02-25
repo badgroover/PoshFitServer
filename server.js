@@ -539,9 +539,12 @@ app.get('/:username/activities', requireLogin, function(req, res){
            today, clientDate;
 
      today = new Date();
+	 console.log("Here\n");      
 	 if(req.query.utc) {
-           clientDate = req.query.utc;
-           activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
+	console.log("Here2\n");
+           clientDate = new Date(req.query.utc);
+	console.log("Here3\n");
+		 activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
          } else {
            clientDate = new Date();
            activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
