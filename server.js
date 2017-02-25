@@ -550,7 +550,9 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 console.log("Server UTC: ");
 	 console.log(today.toISOString());      
 	 console.log("Client UTC: ");
-	 console.log(clientDate.toISOString());      
+	 console.log(clientDate.toISOString());  
+	 console.log("Client TimeZone: ");
+	 console.log(req.query.timezone);
 
          getUserActivityFor(req.session.user_id, activityDate, 
            function success(result) {
