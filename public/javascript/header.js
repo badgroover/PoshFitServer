@@ -14,7 +14,9 @@ $(document).ready(function(){
 			month = today.getMonth() + 1,
 			day = today.getDate();
 		
-		$(this).attr("href", href + "?for=" + year + "-" + month  + "-" + day);
+		var utc = today.toISOString();
+		
+		$(this).attr("href", href + "?for=" + year + "-" + month  + "-" + day + "&" + "utc=" + utc);
 	});
 
 	if((todaysYear + "-" + todaysMonth  + "-" + todaysDay) === challengeStartDate) {
