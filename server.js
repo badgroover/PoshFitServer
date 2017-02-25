@@ -536,13 +536,15 @@ app.get('/:username/activities', requireLogin, function(req, res){
      var callback = {
        success : function success(result) {  
          var activities = result,
-           today;
+           today, clientDate;
 
-         if(req.query.for) {
-           activityDate = req.query.for;  
+     today = new Date();
+	 if(req.query.utc) {
+           clientDate = req.query.utc;
+           activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
          } else {
-           today = new Date();
-           activityDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+           clientDate = new Date();
+           activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
          }
 
          getUserActivityFor(req.session.user_id, activityDate, 
