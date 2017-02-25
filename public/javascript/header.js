@@ -15,8 +15,9 @@ $(document).ready(function(){
 			day = today.getDate();
 		
 		var utc = today.toISOString();
+		var timezone = today.getTimezoneOffset();
 		
-		$(this).attr("href", href + "?for=" + year + "-" + month  + "-" + day + "&" + "utc=" + utc);
+		$(this).attr("href", href + "?for=" + year + "-" + month  + "-" + day + "&" + "utc=" + utc + "&timezone=" + timezone);
 	});
 
 	if((todaysYear + "-" + todaysMonth  + "-" + todaysDay) === challengeStartDate) {
