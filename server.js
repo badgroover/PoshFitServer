@@ -535,9 +535,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
      var callback = {
        success : function success(result) {  
-         var activities = result,
-           today, clientDate;
-
+         var activities = result;
          today = new Date();
 	 if(req.query.utc) {
              clientDate = new Date(req.query.utc);
