@@ -24,13 +24,12 @@ $(document).ready(function(){
 	startDate = new Date(challengeStartDate);
 	console.log(startDate);
 	
-	todayStartTime = new Date(dateToday.getFullYear(), dateToday.getMonth(), dateToday.getDate());
-	
 // 	if((todaysYear + "-" + todaysMonth  + "-" + todaysDay) === challengeStartDate) {
 // 		$(".navbar-nav #nav-yesterday").remove();
 // 	}
 	
-	if(todayStartTime == startDate) {
+	if(dateToday.getFullYear() == startDate.getFullYear() && dateToday.getMonth() == startDate.getMonth()
+	    &&  dateToday.getDate() == startDate.getDate()) {
 	    $(".navbar-nav #nav-yesterday").remove();
 	}
 		
