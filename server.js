@@ -556,6 +556,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 console.log(clientDate.toISOString());  
 	 console.log("Client TimeZone: ");
 	 console.log(req.query.timezone);
+	 console.log("Server TimeZone: ");
+	 console.log(today.timezone);
 	 diffInMinutes = Math.abs(((clientDate - today)/1000)/60);
 	 console.log("Time Diff: ");
 	 console.log(diffInMinutes);
