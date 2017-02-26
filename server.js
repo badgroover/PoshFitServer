@@ -593,7 +593,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
              res.render('user/activities', {
                activitiesByCategory: activitiesByCategory,
-               displayDate: clientDate.toISOString()
+               displayDate: activityDate
              });
          },
          function error(err) {
