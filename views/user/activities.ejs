@@ -5,7 +5,10 @@
     <title>Poshfit Challange Activities</title>
     <script type="text/javascript" src="/javascript/activities.js"></script>
     <script>
-  		var activityDate = "<%= displayDate %>";
+  		var dateString = "<%= displayDate %>";
+		var utc_date = new Date(dateString);
+		var activityDate = utc_date.getFullYear() + "-" + (utc_date.getMonth() + 1) + "-" + utc_date.getDate();
+		
 	</script>
   </head>
   <body class="container">
