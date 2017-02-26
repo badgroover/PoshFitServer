@@ -556,7 +556,12 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 console.log("Time Diff: ");
 	 console.log(diffInMinutes);
 	       
-	       
+	 if(diffInMinutes > 60) {
+	     error = 'Username doesn\'t match the user logged in';
+                 res.render('error', {
+                     error: error
+         	 });
+	 } else {
          getUserActivityFor(req.session.user_id, activityDate, 
            function success(result) {
 
@@ -590,6 +595,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
                  error: error
              });
          });
+	 }
        },
        error : function error(err) {
          //return error
