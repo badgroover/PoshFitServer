@@ -19,6 +19,8 @@ if(argv.e == "dev") {
     envConfig = require('./config/development.json');  
 } else {
     envConfig = require('./config/production.json');  
+    envConfig.start_date = new Date(envConfig.startYear, envConfig.startMonth, envConfig.startDay);
+    envConfig.end_date = new Date(envConfig.endYear, envConfig.endMonth, envConfig.endDay);
 }
 
 app.use(cookieParser());
