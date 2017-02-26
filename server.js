@@ -554,7 +554,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 console.log(req.query.timezone);
 	 diffInMinutes = Math.abs(((clientDate - today)/1000)/60);
 	 console.log("Time Diff: ");
-	 console.log(diff);
+	 console.log(diffInMinutes);
 	       
 	       
          getUserActivityFor(req.session.user_id, activityDate, 
