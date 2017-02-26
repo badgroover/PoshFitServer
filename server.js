@@ -20,6 +20,7 @@ if(argv.e == "dev") {
 } else {
     envConfig = require('./config/production.json');  
     envConfig.start_date = new Date(envConfig.startYear, envConfig.startMonth, envConfig.startDay);
+    console.log(envConfig.start_date);
 }
 
 app.use(cookieParser());
@@ -41,6 +42,7 @@ app.use(function(req, res, next) {
   res.locals.session = req.session;
   res.locals.startDate = envConfig.start_date.toISOString();
   prevDay = new Date(envConfig.start_date.getDate() - 1);
+  console.log(prevDay);
   res.locals.dayBeforeStartDate = prevDay.toISOString();
   next();
 });
