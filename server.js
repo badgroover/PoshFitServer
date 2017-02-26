@@ -20,7 +20,6 @@ if(argv.e == "dev") {
 } else {
     envConfig = require('./config/production.json');  
     envConfig.start_date = new Date(envConfig.startYear, envConfig.startMonth, envConfig.startDay);
-    envConfig.end_date = new Date(envConfig.endYear, envConfig.endMonth, envConfig.endDay);
 }
 
 app.use(cookieParser());
@@ -40,8 +39,9 @@ app.use(express.static('public'));
 
 app.use(function(req, res, next) {
   res.locals.session = req.session;
-  res.locals.startDate = envConfig.startDate;
-  res.locals.dayBeforeStartDate = envConfig.dayBeforeStartDate;
+  res.locals.startDate = envConfig.start_date.toISOString();
+  prevDay = new Date(envConfig.start_date.getDate() - 1);
+  res.locals.dayBeforeStartDate = prevDay.toISOString();
   next();
 });
 
