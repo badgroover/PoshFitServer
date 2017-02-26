@@ -37,10 +37,11 @@ $(document).ready(function(){
 	$(".navbar-nav #nav-yesterday").click(function(){
 		var href = $(this).attr("href"), 
 			today = new Date(), 
-			year = today.getFullYear(),
-			month = today.getMonth() + 1,
-			day = today.getDate();
-		
+		    yesterday = new Date();
+                    yesterday.setDate(today.getDate() - 1);
+		var year = yesterday.getFullYear(),
+		    month = yesterday.getMonth() + 1,
+                     day = yesterday.getDate();
 		var utc = today.toISOString();
 		var timezone = today.getTimezoneOffset();
 		
