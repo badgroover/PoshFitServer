@@ -20,9 +20,20 @@ $(document).ready(function(){
 		$(this).attr("href", href + "?for=" + year + "-" + month  + "-" + day + "&" + "utc=" + utc + "&timezone=" + timezone);
 	});
 
-	if((todaysYear + "-" + todaysMonth  + "-" + todaysDay) === challengeStartDate) {
-		$(".navbar-nav #nav-yesterday").remove();
+	console.log(challengeStartDate);
+	startDate = new Date(challengeStartDate);
+	console.log(startDate);
+	
+	todayStartTime = new Date(dateToday.getFullYear(), dateToday.getMonth(), dateToday.getDate());
+	
+// 	if((todaysYear + "-" + todaysMonth  + "-" + todaysDay) === challengeStartDate) {
+// 		$(".navbar-nav #nav-yesterday").remove();
+// 	}
+	
+	if(todayStartTime == startDate) {
+	    $(".navbar-nav #nav-yesterday").remove();
 	}
+		
 
 	$(".navbar-nav #nav-yesterday").click(function(){
 		var href = $(this).attr("href"), 
