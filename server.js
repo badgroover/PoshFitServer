@@ -557,7 +557,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 console.log(diffInMinutes);
 	       
 	 if(diffInMinutes > 60) {
-	     error = 'Username doesn\'t match the user logged in';
+	     error = 'Date Mismatch!! Please check your system clock!';
                  res.render('error', {
                      error: error
          	 });
