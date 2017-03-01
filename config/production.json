@@ -9,11 +9,11 @@
 	"dayBeforeStartDate": "2016-5-31",
 	"port" : 8083,
 	"host" : "http://52.33.186.147",
-	"startDay": "25",
-	"startMonth": "1",
+	"startDay": "1",
+	"startMonth": "3",
 	"startYear": "2017",
-	"endDay": "26",
-	"endMonth": "2",
+	"endDay": "31",
+	"endMonth": "3",
 	"endYear": "2017"
 	
 }
