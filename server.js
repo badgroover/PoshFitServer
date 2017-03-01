@@ -540,7 +540,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
      var callback = {
        success : function success(result) {  
          var activities = result,
-	 today, clientDate;    
+	 today;    
          today = new Date();
 	 if(req.query.utc) {
              clientDate = new Date(req.query.utc);
@@ -593,7 +593,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
              res.render('user/activities', {
                activitiesByCategory: activitiesByCategory,
-               displayDate: activityDate
+               displayDate: clientDate.toISOString()
              });
          },
          function error(err) {
