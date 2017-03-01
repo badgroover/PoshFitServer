@@ -1,23 +1,23 @@
-1 test_team1
-2 Sassy by Summer
-3 Bod Squad
-4 Flab-u-less
-5 Revenge of the Champions 
-6 No Calories No Cry
-7 Mind Over Miles (MoM)
-8 Misfits
-9 Jumping Amazing Super Optimistic Noodle Squad
-10 Out-FIT Goals
-11 Glossy Unicorn Stylists
-12 Weigh To Kale It!
-13 These Rolls Ain't Loyal
-14 Let’s Get Fiscal
-15 Hakuna MaSquata
-16 Sugar Is The Devil
-17 Thighsman Trophies
-18 MaterniTeam
-19 Drop It Like It's Hot
-20 Spongebob Slowpants
-21 Slim Chance
-22 Team 5
-23 Not So Fit
+1	test_team1
+2	Sassy by Summer
+3	Bod Squad
+4	Flab-u-less
+5	Revenge of the Champions 
+6	No Calories No Cry
+7	Mind Over Miles (MoM)
+8	Misfits
+9	Jumping Amazing Super Optimistic Noodle Squad
+10	Out-FIT Goals
+11	Glossy Unicorn Stylists
+12	Weigh To Kale It!
+13	These Rolls Ain't Loyal
+14	Let’s Get Fiscal
+15	Hakuna MaSquata
+16	Sugar Is The Devil
+17	Thighsman Trophies
+18	MaterniTeam
+19	Drop It Like It's Hot
+20	Spongebob Slowpants
+21	Slim Chance
+22	Team 5
+23	Not So Fit
