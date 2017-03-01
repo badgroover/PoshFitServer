@@ -68,7 +68,7 @@ var findUser = function(username, password, callback) {
     queryHelper.runQuery(queryString, 
         function success(rows) {
             if(rows.length == 1) {
-                if(rows[0].email == username && rows[0].password == password) {
+                if(rows[0].password == password) {
                     callback.success(username, rows[0].id, rows[0].team_id, rows[0].resetFlag);
                 } else {
                     callback.error("Username or Password incorrect");
