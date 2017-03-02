@@ -543,7 +543,10 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 today;    
          today = new Date();
 	 if(req.query.utc) {
-             clientDate = new Date(req.query.utc);
+	     clientDate = new Date(req.query.utc);
+	     if(req.query.yesterday === true) {
+	     	clientDate = new Date(clientDate.getDate() - 1);
+	     }
 	     if(req.query.for) {
 	         activityDate = req.query.for;
 	     } else {
