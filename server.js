@@ -598,9 +598,16 @@ app.get('/:username/activities', requireLogin, function(req, res){
                return activity.Category;
              });
 
+             var dateToDisplay;
+	     if(req.query.yesterday == "true) {
+	        Date yesterday = new Date(clientDate.getDate() - 1); 
+		dateToDisplay = yesterday.toISOString();
+	     } else {
+	         dateToDisplay = clientDate.toISOString();
+	     }
              res.render('user/activities', {
                activitiesByCategory: activitiesByCategory,
-               displayDate: clientDate.toISOString()
+               displayDate: dateToDisplay;
              });
          },
          function error(err) {
