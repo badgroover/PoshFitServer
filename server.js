@@ -600,7 +600,9 @@ app.get('/:username/activities', requireLogin, function(req, res){
 
              var dateToDisplay;
 	     if(req.query.yesterday == "true") {
-	        var yesterday = new Date(clientDate.getDate() - 1); 
+	        yesterday = new Date(clientDate.getDate() - 1); 
+		console.log("Yesterday's Date");
+		console.log(yesterday);     
 		dateToDisplay = yesterday.toISOString();
 	     } else {
 	         dateToDisplay = clientDate.toISOString();
