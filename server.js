@@ -551,7 +551,7 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	     if(req.query.for) {
 	         activityDate = req.query.for;
 		 console.log("Activity Date");
-		 console.log("Server UTC: ");    
+		 console.log(activityDate);    
 		     
 	     } else {
                  activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
