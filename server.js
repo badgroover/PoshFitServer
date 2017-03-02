@@ -543,7 +543,15 @@ app.get('/:username/activities', requireLogin, function(req, res){
 	 today;    
          today = new Date();
 	 if(req.query.utc) {
-	     clientDate = new Date(req.query.utc);
+	     var timestamp=Date.parse(req.query.utc)
+	     if (isNaN(timestamp)==true)
+             {
+		 console.log("Invalid date from client!")
+		 console.log("req.query.utc");    
+                 clientDate = new Date();
+             } else {
+                 clientDate = new Date(req.query.utc);		 
+	     }
 // 	     if(req.query.yesterday == "true") {
 // 		console.log("Yesterday!");     
 // 	     	clientDate = new Date(clientDate.getDate() - 1);
