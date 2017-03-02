@@ -544,12 +544,15 @@ app.get('/:username/activities', requireLogin, function(req, res){
          today = new Date();
 	 if(req.query.utc) {
 	     clientDate = new Date(req.query.utc);
-	     if(req.query.yesterday == "true") {
-		console.log("Yesterday!");     
-	     	clientDate = new Date(clientDate.getDate() - 1);
-	     }
+// 	     if(req.query.yesterday == "true") {
+// 		console.log("Yesterday!");     
+// 	     	clientDate = new Date(clientDate.getDate() - 1);
+// 	     }
 	     if(req.query.for) {
 	         activityDate = req.query.for;
+		 console.log("Activity Date");
+		 console.log("Server UTC: ");    
+		     
 	     } else {
                  activityDate = clientDate.getFullYear() + "-" + (clientDate.getMonth() + 1) + "-" + clientDate.getDate();
 	     }
