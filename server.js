@@ -534,8 +534,8 @@ app.get('/:username/activities', requireLogin, function(req, res){
   //Check user id against the session and make sure user logged in is the user we are checking against
   if(req.session.username == req.params.username){
 
-    // adding a redirect to the dashboard for the end of the competition
-    //res.redirect('/dashboard');
+    //adding a redirect to the dashboard for the end of the competition
+    res.redirect('/dashboard');
 
      var callback = {
        success : function success(result) {  
@@ -656,7 +656,7 @@ app.post('/:username/activities', requireLogin, function(req, res){
     if(req.session.username == req.params.username){
 
       // adding a redirect to the dashboard for the end of the competition
-      //res.redirect('/dashboard');
+      res.redirect('/dashboard');
 
        var activityIdsToBeUpdated,
            activityDuration = _.filter(req.body.activityDuration, function(value){
