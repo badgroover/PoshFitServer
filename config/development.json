@@ -8,5 +8,5 @@
 	"startDate": "2016-1-9",
 	"dayBeforeStartDate": "2016-1-8",
 	"port" : 8083,
-	"host" : "http://52.53.229.110"
+	"host" : "http://127.0.0.1"
 }
