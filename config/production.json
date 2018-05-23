@@ -7,7 +7,7 @@
 	},
 	"startDate": "2016-6-1",
 	"dayBeforeStartDate": "2016-5-31",
-	"port" : 8083,
+	"port" : 3000,
 	"host" : "http://52.33.186.147",
 	"startDay": "1",
 	"startMonth": "2",
