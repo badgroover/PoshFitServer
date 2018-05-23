@@ -14,6 +14,7 @@ var envConfig,
     argv = require('minimist')(process.argv.slice(2));
 
 logger.info(argv);
+logger.info(argv.e);
 
 if(argv.e == "dev") {
     envConfig = require('./config/development.json');  
