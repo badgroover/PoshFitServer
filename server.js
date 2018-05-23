@@ -12,6 +12,7 @@ var express       = require('express'),
 //Set up environment
 var envConfig,
     argv = require('minimist')(process.argv.slice(2));
+sadASD
 
 //logger.info(argv);
 //logger.info(argv.e);
