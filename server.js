@@ -12,7 +12,6 @@ var express       = require('express'),
 //Set up environment
 var envConfig,
     argv = require('minimist')(process.argv.slice(2));
-sadASD
 
 //logger.info(argv);
 //logger.info(argv.e);
@@ -23,6 +22,7 @@ if(argv.e == "dev") {
     envConfig = require('./config/production.json');  
     envConfig.start_date = new Date(envConfig.startYear, envConfig.startMonth, envConfig.startDay);
     console.log(envConfig.start_date);
+    console.log("Running Prod!");
 }
 
 app.use(cookieParser());
