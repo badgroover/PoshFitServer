@@ -1,7 +1,7 @@
 # PoshFitServer
 Node application for poshfit server
 Step 1: Install Node.
-Step 2: run "npm install" from the PoshfirServer root  directory.
+Step 2: run "npm install" from the PoshFitServer root  directory.
 Step 3: "node server.js" will start the server.
 
 Note:
